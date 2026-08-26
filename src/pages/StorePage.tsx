@@ -87,7 +87,7 @@ export default function StorePage({ id, onBack }: { id: string; onBack: () => vo
 
       {/* floating cart bar */}
       {cartCount > 0 && cart.storeId === id && (
-        <div className="fixed inset-x-0 bottom-20 z-20 mx-auto max-w-[480px] px-4">
+        <div className="fixed inset-x-0 bottom-4 z-20 mx-auto max-w-[480px] px-4 pb-safe">
           <button onClick={() => setCheckout(true)} className="card-pop flex w-full items-center gap-3 rounded-full bg-gradient-to-r from-orange-500 to-red-500 py-3.5 pl-5 pr-2 font-bold text-white shadow-xl shadow-orange-500/30">
             <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-white/25 text-sm">{cartCount}</span>
             <span className="flex-1 text-left">ดูตะกร้า</span>
