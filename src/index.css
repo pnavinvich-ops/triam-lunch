@@ -1,41 +1,25 @@
 @import "tailwindcss";
 
-:root {
-  --brand: #f97316;
-  --brand-dark: #c2410c;
-}
-
 html, body { overscroll-behavior-y: none; }
-body { -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Thai', 'Prompt', system-ui, -apple-system, sans-serif; background: #e2e8f0; }
-
-/* phone frame on desktop, full-bleed on real phones */
-#root {
-  max-width: 480px; margin: 0 auto; min-height: 100dvh;
-  background: #f8fafc;
-  position: relative;
-}
-@media (min-width: 520px) {
-  #root { box-shadow: 0 0 60px rgba(15,23,42,.18); min-height: 100dvh; }
+body {
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'IBM Plex Sans Thai', 'Noto Sans Thai', system-ui, -apple-system, sans-serif;
+  background: #f6f6f6;
+  color: #191919;
 }
 
-.hero {
-  background: linear-gradient(135deg, #fb923c 0%, #f97316 40%, #dc2626 100%);
-}
+#root { max-width: 480px; margin: 0 auto; min-height: 100dvh; background: #f6f6f6; }
+@media (min-width: 520px) { #root { box-shadow: 0 0 48px rgba(0,0,0,.14); } }
 
-.card-pop { transition: transform .15s ease, box-shadow .15s ease; }
-.card-pop:active { transform: scale(.97); }
+.card-pop:active { opacity: .85; }
 
-.chip { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold; }
+.skeleton { @apply animate-pulse rounded-lg bg-neutral-200; }
 
-.skeleton { @apply animate-pulse rounded-2xl bg-slate-200; }
-
-@keyframes slideUp { from { transform: translateY(40px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
-.sheet-in { animation: slideUp .25s cubic-bezier(.2,.8,.2,1); }
-
+@keyframes slideUp { from { transform: translateY(32px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+.sheet-in { animation: slideUp .2s cubic-bezier(.2,.8,.2,1); }
 @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-.fade-in { animation: fadeIn .18s ease; }
+.fade-in { animation: fadeIn .15s ease; }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
-
 .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
