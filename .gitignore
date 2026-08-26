@@ -1,0 +1,9 @@
+node_modules
+dist
+.env.local
+.env
+
+.vercel
+.env*
+*.txt
+vercel_out*.txt
