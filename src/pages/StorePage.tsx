@@ -33,21 +33,21 @@ export default function StorePage({ id, onBack }: { id: string; onBack: () => vo
   return (
     <div className="fade-in min-h-dvh">
       {/* flat header */}
-      <header className="bg-white px-4 pb-4 pt-3">
-        <button onClick={onBack} className="-ml-1 flex items-center gap-1 py-1 pr-2 text-[15px] font-medium text-neutral-600">
+      <header className="rounded-b-[24px] bg-gradient-to-br from-orange-500 via-orange-600 to-red-500 px-4 pb-5 pt-3 text-white shadow-lg shadow-orange-500/20">
+        <button onClick={onBack} className="-ml-1 flex items-center gap-1 rounded-full py-1 pr-2.5 text-[14px] font-medium text-white/90">
           <ChevronLeft size={20} /> กลับ
         </button>
         <div className="mt-1 flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h1 className="truncate text-xl font-bold tracking-tight">{store.name}</h1>
-            {store.description && <p className="mt-0.5 truncate text-[13px] text-neutral-500">{store.description}</p>}
+            {store.description && <p className="mt-0.5 truncate text-[13px] text-white/85">{store.description}</p>}
           </div>
-          <span className={`mt-1 flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${store.is_open ? 'bg-emerald-50 text-emerald-700' : 'bg-neutral-100 text-neutral-500'}`}>
+          <span className={`mt-1 flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold backdrop-blur ${store.is_open ? 'bg-emerald-400/90 text-white' : 'bg-black/20 text-white/80'}`}>
             <span className={`h-1.5 w-1.5 rounded-full ${store.is_open ? 'bg-emerald-500' : 'bg-neutral-400'}`} />
             {store.is_open ? 'เปิดรับ' : 'ปิดแล้ว'}
           </span>
         </div>
-        <div className="mt-2 flex items-center gap-4 text-xs text-neutral-500">
+        <div className="mt-2 flex items-center gap-4 text-xs text-white/80">
           <span className="flex items-center gap-1"><Clock size={13} /> {store.open_time}–{store.close_time}</span>
           {store.location && <span className="flex min-w-0 items-center gap-1"><MapPin size={13} /><span className="truncate">{store.location}</span></span>}
         </div>
