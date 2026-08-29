@@ -14,6 +14,7 @@ export interface Store {
   close_time: string
   pickup_slots: string[]
   is_open: boolean
+  image_url?: string | null
 }
 
 export interface MenuItem {
@@ -25,6 +26,7 @@ export interface MenuItem {
   description: string
   available: boolean
   daily_note: string
+  image_url?: string | null
 }
 
 export type OrderStatus = 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'

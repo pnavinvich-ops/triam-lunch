@@ -177,7 +177,7 @@ function Home({stores,loading,onOpen}:{stores:StoreType[];loading:boolean;onOpen
           <div className="no-scrollbar flex gap-3 overflow-x-auto pb-1">
             {popular.slice(0,8).map(m=>(
               <div key={m.id} className="w-[148px] shrink-0 overflow-hidden rounded-[12px] border border-[var(--color-border)] bg-white card-shadow">
-                <div className="flex h-[96px] items-center justify-center bg-[#f3f3f3] text-sm font-bold text-[var(--color-text-2)]">{m.name.slice(0,2)}</div>
+                {m.image_url ? <img src={m.image_url} alt={m.name} className="h-[96px] w-full object-cover" loading="lazy" /> : <div className="flex h-[96px] items-center justify-center bg-[#f3f3f3] text-sm font-bold text-[var(--color-text-2)]">{m.name.slice(0,2)}</div>}
                 <div className="p-2.5">
                   <p className="line-clamp-1 text-sm font-semibold leading-tight">{m.name}</p>
                   <p className="mt-0.5 text-xs text-[var(--color-text-2)]">{m.category}</p>
@@ -202,8 +202,8 @@ function Home({stores,loading,onOpen}:{stores:StoreType[];loading:boolean;onOpen
             const r=ratingFor(s.id), rev=reviewsFor(s.id)
             return (
               <button key={s.id} onClick={()=>onOpen(s.id)} className="card-shadow flex gap-3 rounded-[12px] border border-[var(--color-border)] bg-white p-3 text-left transition hover:card-shadow-hover">
-                <div className="relative flex h-[84px] w-[84px] shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-[#f3f3f3] text-sm font-bold text-[var(--color-text-2)] ring-1 ring-[var(--color-border)]">
-                  {s.name.slice(0,2)}
+                <div className="relative flex h-[84px] w-[84px] shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-[#f3f3f3] ring-1 ring-[var(--color-border)]">
+                  {s.image_url ? <img src={s.image_url} alt={s.name} className="h-full w-full object-cover" loading="lazy" /> : <span className="text-sm font-bold text-[var(--color-text-2)]">{s.name.slice(0,2)}</span>}
                   <span className="absolute bottom-1 left-1 rounded-full bg-white px-1.5 py-0.5 text-[10px] font-bold tracking-wide ring-1 ring-[var(--color-border)]">฿25 • ส่งฟรี</span>
                   {!s.is_open && <span className="absolute inset-0 flex items-center justify-center bg-white/80 text-xs font-bold backdrop-blur-[1px]">ปิด</span>}
                 </div>

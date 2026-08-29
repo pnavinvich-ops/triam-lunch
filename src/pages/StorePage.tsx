@@ -42,7 +42,7 @@ export default function StorePage({ id, onBack }: { id: string; onBack: () => vo
       {/* Store header — flat white card, no hero gradient */}
       <section className="border-b border-[var(--color-border)] bg-white px-4 pb-4 pt-4">
         <div className="flex gap-3">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] border border-[var(--color-border)] bg-[#f3f3f3] text-sm font-bold text-[var(--color-text-2)]">{store.name.slice(0,2)}</div>
+          {store.image_url ? <img src={store.image_url} alt={store.name} className="h-14 w-14 shrink-0 rounded-[12px] object-cover ring-1 ring-[var(--color-border)]" loading="lazy" /> : <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] border border-[var(--color-border)] bg-[#f3f3f3] text-sm font-bold text-[var(--color-text-2)]">{store.name.slice(0,2)}</div>}
           <div className="min-w-0 flex-1">
             <h1 className="text-[16px] font-bold leading-tight tracking-tight">{store.name}</h1>
             {store.description && <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-[var(--color-text-2)]">{store.description}</p>}
@@ -131,7 +131,7 @@ function FoodRow({item,disabled}:{item:MenuItem;disabled?:boolean}){
         <p className="mt-1 flex items-center gap-1 text-[11px] text-[var(--color-text-3)]"><Star size={10} className="fill-amber-400 text-amber-400" /> 4.8 · 50+ สั่งแล้ว</p>
       </div>
       <div className="flex w-[96px] shrink-0 flex-col items-stretch gap-2">
-        <div className="flex h-[72px] items-center justify-center rounded-[10px] bg-[#f3f3f3] text-xs font-bold text-[var(--color-text-3)] ring-1 ring-[var(--color-border)]">{item.name.slice(0,2)}</div>
+        {item.image_url ? <img src={item.image_url} alt={item.name} className="h-[72px] w-[96px] shrink-0 rounded-[10px] object-cover ring-1 ring-[var(--color-border)]" loading="lazy" /> : <div className="flex h-[72px] w-[96px] shrink-0 items-center justify-center rounded-[10px] bg-[#f3f3f3] text-xs font-bold text-[var(--color-text-3)] ring-1 ring-[var(--color-border)]">{item.name.slice(0,2)}</div>}
         {inCart>0 ? (
           <span className="flex items-center justify-between rounded-full bg-[var(--color-text)] p-1 text-white">
             <button onClick={()=>useCart.getState().setQty(item.id, inCart-1)} className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15"><Minus size={14} /></button>
