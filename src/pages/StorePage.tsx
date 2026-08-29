@@ -7,7 +7,7 @@ const onImgErr=(e:React.SyntheticEvent<HTMLImageElement>)=>{(e.currentTarget.sty
 
 function ratingForStore(id: string){ let h=0; for(let i=0;i<id.length;i++) h=(h*31+id.charCodeAt(i))>>>0; return (4.4 + (h%6)/10).toFixed(1) }
 
-export default function StorePage({ id, onBack }: { id: string; onBack: () => void }) {
+export default function StorePage({ id, onBack, onTrack }: { id: string; onBack: () => void; onTrack?: () => void }) {
   const [store, setStore] = useState<Store | null>(null)
   const [items, setItems] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -60,7 +60,7 @@ export default function StorePage({ id, onBack }: { id: string; onBack: () => vo
             if(has) favs.delete(id); else favs.add(id)
             localStorage.setItem('tl_favs',JSON.stringify([...favs])); alert(has?'ลบจากรายการโปรดแล้ว':'บันทึกเป็นร้านโปรดแล้ว')
           }catch{ alert('บันทึกไม่สำเร็จ')}
-        }} aria-label="รายการโปรด" className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-white"><Heart size={16} /></button>
+        }} aria-label="รายการโปรด" className={`flex h-9 w-9 items-center justify-center rounded-full border ${(()=>{try{return new Set(JSON.parse(localStorage.getItem('tl_favs')??'[]')).has(id)}catch{return false}})() ? 'border-red-200 bg-red-50 text-red-500' : 'border-[var(--color-border)] bg-white'}`}><Heart size={16} fill={(()=>{try{return new Set(JSON.parse(localStorage.getItem('tl_favs')??'[]')).has(id)}catch{return false}})() ? 'currentColor':'none'} /></button>
         <button onClick={async()=>{
           const url=location.href; const text=`${store.name} — ${store.description??''}`
           try{
@@ -72,7 +72,7 @@ export default function StorePage({ id, onBack }: { id: string; onBack: () => vo
 
       <section className="border-b border-[var(--color-border)] bg-white px-4 pb-4 pt-4">
         <div className="flex gap-3">
-          {store.image_url ? <img src={store.image_url} alt={store.name} className="h-14 w-14 shrink-0 rounded-[12px] object-cover ring-1 ring-[var(--color-border)]" loading="lazy" onError={onImgErr} /> : <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] border border-[var(--color-border)] bg-[#f3f3f3] text-sm font-bold text-[var(--color-text-2)]">{store.name.slice(0,2)}</div>}
+          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-[12px] ring-1 ring-[var(--color-border)] bg-[#f3f3f3]">{store.image_url ? <><img src={store.image_url} alt={store.name} className="h-full w-full object-cover" loading="lazy" onError={onImgErr} /><div style={{display:"none"}} className="absolute inset-0 flex items-center justify-center text-sm font-bold text-[var(--color-text-2)] bg-[#f3f3f3]">{store.name.slice(0,2)}</div></> : <div className="flex h-full w-full items-center justify-center text-sm font-bold text-[var(--color-text-2)]">{store.name.slice(0,2)}</div>}</div>
           <div className="min-w-0 flex-1">
             <h1 className="text-[16px] font-bold leading-tight tracking-tight">{store.name}</h1>
             {store.description && <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-[var(--color-text-2)]">{store.description}</p>}
@@ -101,8 +101,8 @@ export default function StorePage({ id, onBack }: { id: string; onBack: () => vo
       {/* Promo pills — informative, first pill explains terms */}
       <div className="no-scrollbar flex gap-2 overflow-x-auto bg-white px-3 py-2.5">
         <button onClick={()=>alert('ส่วนลด 10฿ — ใช้ได้เมื่อสั่งก่อน 11:30 น. รับที่ร้าน จ่ายเงินสด · ระบบจะหักอัตโนมัติตอนชำระเงิน')} className="shrink-0 rounded-full bg-[var(--color-text)] px-3 py-1.5 text-xs font-semibold text-white">ส่วนลด 10฿ · สั่งล่วงหน้า</button>
-        <span className="shrink-0 rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium">รับที่ร้าน · ไม่รอคิว</span>
-        <span className="shrink-0 rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium">จ่ายเงินสด</span>
+        <button onClick={()=>alert('รับที่ร้าน — มารับตรงเวลา ไม่ต้องรอคิว')} className="shrink-0 rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium">รับที่ร้าน · ไม่รอคิว</button>
+        <button onClick={()=>alert('ชำระเงินสดที่ร้าน — ไม่ต้องโอนล่วงหน้า')} className="shrink-0 rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium">จ่ายเงินสด</button>
       </div>
 
       {/* Category tabs */}
@@ -115,7 +115,7 @@ export default function StorePage({ id, onBack }: { id: string; onBack: () => vo
       <div className="px-3 pt-3">
         <div className="mb-2 flex items-center justify-between px-1">
           <h2 className="text-sm font-bold tracking-tight">{activeCat || 'เมนู'} <span className="font-medium text-[var(--color-text-2)]">· {visible.length} รายการ</span></h2>
-          <span className="text-xs font-medium text-[var(--color-text-2)]">เรียง: แนะนำ</span>
+          <button onClick={()=>alert('เรียงตาม: แนะนำ — เมนูยอดนิยมขึ้นก่อน')} className="text-xs font-medium text-[var(--color-text-2)]">เรียง: แนะนำ</button>
         </div>
         {visible.length===0 && <div className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-white p-8 text-center"><Package size={22} className="mx-auto text-[var(--color-text-3)]" /><p className="mt-2 text-sm font-medium">ยังไม่มีเมนู</p></div>}
         <div className="grid gap-2.5">
@@ -140,7 +140,7 @@ export default function StorePage({ id, onBack }: { id: string; onBack: () => vo
           <p className="py-1 text-center text-[11px] text-[var(--color-text-3)]">{store.is_open ? 'รับที่ร้าน · ชำระเงินสด' : 'เปิด ' + store.open_time + ' น.'} {discountApplies && cartTotal>0 ? '· ลด 10฿ อัตโนมัติ' : ''}</p>
         </div>
       )}
-      {checkout && store && <CheckoutSheet store={store} discountedTotal={discountedTotal} discountApplies={discountApplies} onClose={()=>setCheckout(false)} />}
+      {checkout && store && <CheckoutSheet store={store} discountedTotal={discountedTotal} discountApplies={discountApplies} onClose={()=>setCheckout(false)} onTrack={onTrack} onBack={onBack} />}
       {showInfo && (
         <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/40" onClick={()=>setShowInfo(false)} role="dialog" aria-modal="true" aria-label="ข้อมูลร้าน">
           <div onClick={e=>e.stopPropagation()} className="w-full max-w-[480px] rounded-t-[16px] bg-white p-4 pb-8">
@@ -190,7 +190,7 @@ function FoodRow({item, storeId, storeOpen}:{item:MenuItem; storeId:string; stor
           <span className="flex items-center justify-between rounded-full bg-[var(--color-text)] p-1 text-white">
             <button onClick={()=>cart.setQty(item.id, inCart-1)} aria-label="ลดจำนวน" className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15"><Minus size={14} /></button>
             <span className="min-w-4 text-center text-sm font-bold tabular-nums">{inCart}</span>
-            <button onClick={()=>{ if(blockedByStore) return; cart.add(item)}} aria-label="เพิ่มจำนวน" className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-[var(--color-text)]"><Plus size={14} /></button>
+            <button onClick={()=>{ if(blockedByStore){ if(confirm('ตะกร้ามีเมนูจากร้านอื่น — ล้างตะกร้าเดิมแล้วเพิ่มเมนูนี้?')){ cart.clear(); cart.add(item)} return } cart.add(item)}} aria-label="เพิ่มจำนวน" className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-[var(--color-text)]"><Plus size={14} /></button>
           </span>
         ) : (
           <button disabled={disabled && !blockedByStore} onClick={handleAdd} className="rounded-full bg-[var(--color-text)] py-2 text-xs font-bold text-white disabled:bg-[#e8e8e8] disabled:text-[var(--color-text-3)]">{blockedByStore ? 'ล้างแล้วเพิ่ม' : 'เพิ่ม'}</button>
@@ -200,7 +200,7 @@ function FoodRow({item, storeId, storeOpen}:{item:MenuItem; storeId:string; stor
   )
 }
 
-function CheckoutSheet({ store, onClose, discountedTotal, discountApplies }: { store: Store; onClose: () => void; discountedTotal:number; discountApplies:boolean }) {
+function CheckoutSheet({ store, onClose, discountedTotal, discountApplies, onTrack, onBack }: { store: Store; onClose: () => void; discountedTotal:number; discountApplies:boolean; onTrack?:()=>void; onBack?:()=>void }) {
   const cart = useCart()
   const [name, setName] = useState(()=>{ try{ return localStorage.getItem('tl_name') ?? '' }catch{ return '' } })
   const [phone, setPhone] = useState(()=>{ try{ return localStorage.getItem('tl_phone') ?? '' }catch{ return '' } })
@@ -225,7 +225,7 @@ function CheckoutSheet({ store, onClose, discountedTotal, discountApplies }: { s
   const submit = async () => {
     if (!validate()) return
     setBusy(true)
-    const orderCode = 'T' + Math.random().toString(36).slice(2,6).toUpperCase() + String(new Date().getMinutes()).padStart(2,'0')
+    const orderCode = 'T' + (typeof crypto!=='undefined'&& (crypto as any).randomUUID ? (crypto as any).randomUUID().slice(0,8).toUpperCase() : Math.random().toString(36).slice(2,10).toUpperCase())
     const finalTotal = discountApplies ? Math.max(0, total-10) : total
     const { data: order, error } = await supabase.from('lunch_orders').insert({ order_code: orderCode, store_id: store.id, customer_name: name.trim(), customer_phone: phone.trim(), note: note.trim(), pickup_slot: slot, total_thb: finalTotal }).select().single()
     if (error) { alert('สั่งไม่สำเร็จ: '+error.message); setBusy(false); return }
@@ -255,7 +255,7 @@ function CheckoutSheet({ store, onClose, discountedTotal, discountApplies }: { s
       </div>
       <div className="grid grid-cols-2 gap-2">
         <button onClick={onClose} className="rounded-full border border-[var(--color-border)] bg-white py-3.5 text-sm font-semibold">อยู่หน้านี้</button>
-        <button onClick={()=>{ onClose(); location.hash='#track' }} className="rounded-full bg-[var(--color-text)] py-3.5 text-sm font-semibold text-white">ติดตามคำสั่งซื้อ</button>
+        <button onClick={()=>{ onClose(); if(onTrack) onTrack(); else if(onBack) { onBack(); setTimeout(()=>window.scrollTo(0,0),50) } }} className="rounded-full bg-[var(--color-text)] py-3.5 text-sm font-semibold text-white">ติดตามคำสั่งซื้อ</button>
       </div>
     </div></Overlay>
   )
@@ -299,4 +299,4 @@ function CheckoutSheet({ store, onClose, discountedTotal, discountApplies }: { s
   )
 }
 const input='w-full rounded-[10px] border border-[var(--color-border)] bg-white px-3.5 py-2.5 text-sm outline-none focus:border-[var(--color-text)] focus:ring-2 focus:ring-black/5'
-function Overlay({children, onClose}:{children:React.ReactNode; onClose:()=>void}){ return <div onClick={onClose} className="fixed inset-0 z-40 flex items-end justify-center bg-black/40"><div onClick={e=>e.stopPropagation()} className="max-h-[88dvh] w-full max-w-[480px] overflow-y-auto rounded-t-[16px] bg-white p-4 pb-8">{children}</div></div> }
+function Overlay({children, onClose}:{children:React.ReactNode; onClose:()=>void}){ return <div role="dialog" aria-modal="true" aria-label="ตะกร้า" onClick={onClose} className="fixed inset-0 z-40 flex items-end justify-center bg-black/40"><div onClick={e=>e.stopPropagation()} className="max-h-[88dvh] w-full max-w-[480px] overflow-y-auto rounded-t-[16px] bg-white p-4 pb-8">{children}</div></div> }

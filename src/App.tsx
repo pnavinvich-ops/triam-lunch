@@ -44,7 +44,7 @@ export default function App(){
   return (
     <div className="min-h-dvh">
       <main className={`mx-auto max-w-[480px] ${view.page==='store'?'pb-24':'pb-[64px]'}`}>
-        {view.page==='store' && <StorePage id={view.id} onBack={()=>setView({page:'home'})} />}
+        {view.page==='store' && <StorePage id={view.id} onBack={()=>setView({page:'home'})} onTrack={()=>{ setView({page:'home'}); setTab('track') }} />}
         {view.page==='home' && tab==='home' && <Home stores={stores} loading={loading} loadErr={loadErr} onRetry={loadStores} onOpen={id=>setView({page:'store',id})} />}
         {view.page==='home' && tab==='track' && <TrackOrderView />}
         {view.page==='home' && tab==='owner' && <OwnerHome onBackHome={()=>setTab('home')} />}
@@ -79,19 +79,22 @@ function Home({stores,loading,loadErr,onRetry,onOpen}:{stores:StoreType[];loadin
   const [recent,setRecent]=useState<string[]>(()=> safeParse<string[]>('tl_recent_q',[]))
   const [popular,setPopular]=useState<MenuItem[]>([])
   const [popErr,setPopErr]=useState<string|null>(null)
+  const [menuIndex,setMenuIndex]=useState<{store_id:string;name:string;category:string}[]>([])
   const [showFilter,setShowFilter]=useState(false)
   const [showCoupon,setShowCoupon]=useState(false)
   const [showLocation,setShowLocation]=useState(false)
   const [filterOpenOnly,setFilterOpenOnly]=useState(false)
   const [sortBy,setSortBy]=useState<'default'|'rating'|'reviews'>('default')
+  const [favOnly,setFavOnly]=useState(false)
   const qInputRef=useRef<HTMLInputElement>(null)
 
-  const toggleFav=(id:string)=>{ const n=new Set(favs); n.has(id)?n.delete(id):n.add(id); setFavs(n); localStorage.setItem('tl_favs',JSON.stringify([...n])) }
+  const toggleFav=(id:string)=>{ const n=new Set(favs); n.has(id)?n.delete(id):n.add(id); setFavs(n); try{ localStorage.setItem('tl_favs',JSON.stringify([...n])) }catch{} }
 
   useEffect(()=>{
     supabase.from('lunch_menu_items').select('*').eq('available',true).limit(12).then(({data,error})=>{
       if(error) setPopErr(error.message); else setPopular(data??[])
     })
+    supabase.from('lunch_menu_items').select('store_id,name,category').then(({data})=> setMenuIndex((data??[]) as any))
   },[])
 
   // debounce search 200ms
@@ -102,15 +105,16 @@ function Home({stores,loading,loadErr,onRetry,onOpen}:{stores:StoreType[];loadin
     if(qDebounced.trim()){
       const qq=qDebounced.toLowerCase()
       // search stores + also match via popular menu names (menu search promise fulfilled)
-      const menuMatchStoreIds = new Set(popular.filter(m=> m.name.toLowerCase().includes(qq) || (m.category??'').toLowerCase().includes(qq)).map(m=>m.store_id))
+      const menuMatchStoreIds = new Set(menuIndex.filter(m=> m.name.toLowerCase().includes(qq) || (m.category??'').toLowerCase().includes(qq)).map(m=>m.store_id))
       r=r.filter(s=> s.name.toLowerCase().includes(qq) || (s.description??'').toLowerCase().includes(qq) || menuMatchStoreIds.has(s.id))
     }
     if(cat!=='all'){
       // filter by store's menu category — check if any menu item for that store matches cat
       // fallback to name/description includes for stores without menu fetched yet
-      const catStoreIds = new Set(popular.filter(m=> (m.category??'').includes(cat) || m.name.includes(cat)).map(m=>m.store_id))
-      r=r.filter(s=> catStoreIds.has(s.id) || (s.name+s.description).includes(cat))
+      const catStoreIds = new Set(menuIndex.filter(m=> (m.category??'').includes(cat) || m.name.includes(cat)).map(m=>m.store_id))
+      r=r.filter(s=> catStoreIds.has(s.id))
     }
+    if(favOnly) r=r.filter(s=> favs.has(s.id))
     if(filterOpenOnly) r=r.filter(s=> s.is_open)
     if(mode==='preorder') r=[...r].sort((a,b)=> Number(b.is_open)-Number(a.is_open)) // preorder: open first
     if(sortBy==='rating') r=[...r].sort((a,b)=> Number(ratingFor(b.id)) - Number(ratingFor(a.id)))
@@ -118,7 +122,8 @@ function Home({stores,loading,loadErr,onRetry,onOpen}:{stores:StoreType[];loadin
     return r
   },[stores,qDebounced,cat,popular,filterOpenOnly,mode,sortBy])
 
-  const onSearch=(v:string)=>{ setQ(v); if(v.trim().length>=2){ const n=[v.trim(), ...recent.filter(x=>x!==v.trim())].slice(0,4); setRecent(n); localStorage.setItem('tl_recent_q',JSON.stringify(n)) } }
+  const onSearch=(v:string)=>{ setQ(v); if(v.trim().length>=2){ const n=[v.trim(), ...recent.filter(x=>x!==v.trim())].slice(0,4); setRecent(n); try{ localStorage.setItem('tl_recent_q',JSON.stringify(n)) }catch{} } }
+  useEffect(()=>{ const h=(e:KeyboardEvent)=>{ if(e.key==='Escape'){ setShowFilter(false); setShowCoupon(false); setShowLocation(false)} }; window.addEventListener('keydown',h); return ()=> window.removeEventListener('keydown',h)},[])
 
   const reorder = safeParse<{code:string;store:string;at:number}[]>('tl_my_orders',[]) 
   const lastOrder = reorder.length ? reorder[reorder.length-1] : null
@@ -146,11 +151,11 @@ function Home({stores,loading,loadErr,onRetry,onOpen}:{stores:StoreType[];loadin
         </div>
 
         <div className="mt-3 flex items-center gap-2">
-          <label className="flex flex-1 items-center gap-2 rounded-full border border-[var(--color-border)] bg-[#f3f3f3] px-3.5 py-2.5">
+          <div className="flex flex-1 items-center gap-2 rounded-full border border-[var(--color-border)] bg-[#f3f3f3] px-3.5 py-2.5">
             <Search size={16} className="text-[var(--color-text-3)] shrink-0" />
-            <input ref={qInputRef} value={q} onChange={e=>onSearch(e.target.value)} placeholder="ค้นหาร้าน หรือเมนู" aria-label="ค้นหาร้านหรือเมนู" autoComplete="off" maxLength={60} className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-[var(--color-text-3)]" />
+            <input ref={qInputRef} id="home-search" value={q} onChange={e=>onSearch(e.target.value)} placeholder="ค้นหาร้าน หรือเมนู" aria-label="ค้นหาร้านหรือเมนู" autoComplete="off" maxLength={60} className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-[var(--color-text-3)]" />
             {q && <button onClick={()=>setQ('')} aria-label="ล้างคำค้น" className="rounded-full bg-white p-1 ring-1 ring-[var(--color-border)]"><X size={12} /></button>}
-          </label>
+          </div>
           <button onClick={()=>setShowFilter(true)} aria-label="ตัวกรอง" className={`flex h-10 w-10 items-center justify-center rounded-full border bg-white ${filterOpenOnly||sortBy!=='default'?'border-[var(--color-accent)] bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)]':'border-[var(--color-border)]'}`}><SlidersHorizontal size={16} /></button>
         </div>
 
@@ -176,8 +181,8 @@ function Home({stores,loading,loadErr,onRetry,onOpen}:{stores:StoreType[];loadin
           <button onClick={()=>{ if(lastOrder){ const st=stores.find(x=>x.name===lastOrder.store); if(st) onOpen(st.id); else alert('ไม่พบร้านของออเดอร์ล่าสุด')} else alert('ยังไม่มีประวัติการสั่ง — สั่งอาหารก่อนแล้วจะสั่งซ้ำได้เลย')}} aria-label="สั่งซ้ำ" className="flex flex-col items-center"><Quick Icon={RotateCcw} label="สั่งซ้ำ" sub={lastOrder ? lastOrder.store.slice(0,8) : 'ยังไม่มี'} /></button>
           <button onClick={()=>{
             if(favs.size===0) alert('ยังไม่มีร้านโปรด — กดหัวใจที่ร้านเพื่อบันทึก')
-            else { setFilterOpenOnly(false); /* scroll to stores */ document.getElementById('store-list')?.scrollIntoView({behavior:'smooth'}) }
-          }} aria-label={`รายการโปรด ${favs.size} ร้าน`} className="flex flex-col items-center"><Quick Icon={Bookmark} label="รายการโปรด" sub={`${favs.size} ร้าน`} /></button>
+            else { setFavOnly(v=>!v); document.getElementById('store-list')?.scrollIntoView({behavior:'smooth'}) }
+          }} aria-label={`รายการโปรด ${favs.size} ร้าน`} className="flex flex-col items-center"><Quick Icon={Bookmark} label="รายการโปรด" sub={favOnly? 'กำลังกรอง' : `${favs.size} ร้าน`} /></button>
           <button onClick={()=>setShowCoupon(true)} aria-label="ดูคูปอง" className="flex flex-col items-center"><Quick Icon={Ticket} label="คูปอง" sub="ลด 10฿" accent /></button>
           <button onClick={()=>alert('Triam Lunch Premium — เร็วๆ นี้: ฟรีค่าส่งทุกออเดอร์ + ส่วนลดพิเศษ')} aria-label="พรีเมียม" className="flex flex-col items-center"><Quick Icon={Crown} label="พรีเมียม" sub="ฟรีค่าส่ง" /></button>
         </div>
@@ -293,10 +298,14 @@ function Home({stores,loading,loadErr,onRetry,onOpen}:{stores:StoreType[];loadin
             <div className="mx-auto mb-3 h-1 w-9 rounded-full bg-[var(--color-border)]" />
             <div className="flex items-center justify-between"><h3 className="text-[15px] font-bold">ตัวกรอง</h3><button onClick={()=>setShowFilter(false)} aria-label="ปิด" className="rounded-full border border-[var(--color-border)] p-1.5"><X size={16} /></button></div>
             <div className="mt-4 grid gap-3">
-              <label className="flex items-center justify-between rounded-[12px] border border-[var(--color-border)] bg-[#fafafa] px-3.5 py-3">
+              <div className="flex items-center justify-between rounded-[12px] border border-[var(--color-border)] bg-[#fafafa] px-3.5 py-3">
                 <span className="text-sm font-medium">แสดงเฉพาะร้านที่เปิด</span>
-                <button onClick={()=>setFilterOpenOnly(v=>!v)} role="switch" aria-checked={filterOpenOnly} className={`flex h-6 w-11 items-center rounded-full p-0.5 transition ${filterOpenOnly?'bg-[var(--color-accent)]':'bg-[#e5e5e5]'}`}><span className={`h-5 w-5 rounded-full bg-white shadow transition ${filterOpenOnly?'translate-x-5':''}`} /></button>
-              </label>
+                <button onClick={()=>setFilterOpenOnly(v=>!v)} role="switch" aria-checked={filterOpenOnly} aria-label="แสดงเฉพาะร้านที่เปิด" className={`flex h-6 w-11 items-center rounded-full p-0.5 transition ${filterOpenOnly?'bg-[var(--color-accent)]':'bg-[#e5e5e5]'}`}><span className={`h-5 w-5 rounded-full bg-white shadow transition ${filterOpenOnly?'translate-x-5':''}`} /></button>
+              </div>
+              <div className="flex items-center justify-between rounded-[12px] border border-[var(--color-border)] bg-[#fafafa] px-3.5 py-3">
+                <span className="text-sm font-medium">เฉพาะร้านโปรด</span>
+                <button onClick={()=>setFavOnly(v=>!v)} role="switch" aria-checked={favOnly} aria-label="เฉพาะร้านโปรด" className={`flex h-6 w-11 items-center rounded-full p-0.5 transition ${favOnly?'bg-[var(--color-accent)]':'bg-[#e5e5e5]'}`}><span className={`h-5 w-5 rounded-full bg-white shadow transition ${favOnly?'translate-x-5':''}`} /></button>
+              </div>
               <div>
                 <p className="mb-2 text-sm font-semibold">เรียงตาม</p>
                 <div className="flex gap-2">
