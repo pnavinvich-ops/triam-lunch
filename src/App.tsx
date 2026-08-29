@@ -22,6 +22,8 @@ const CAT_DEFS: { id: string; label: string; Icon: typeof UtensilsCrossed; bg: s
   { id:'ของหวาน', label:'ของหวาน', Icon: Cookie, bg:'bg-violet-50', fg:'text-violet-700' },
 ]
 
+const onImgErr=(e:React.SyntheticEvent<HTMLImageElement>)=>{(e.currentTarget.style.display='none'); const p=e.currentTarget.nextElementSibling as HTMLElement|null; if(p) p.style.display='flex'}
+
 export default function App(){
   const [tab,setTab]=useState<Tab>('home')
   const [view,setView]=useState<View>({page:'home'})
@@ -126,9 +128,9 @@ function Home({stores,loading,onOpen}:{stores:StoreType[];loading:boolean;onOpen
       {/* Quick actions — 4-up, flat, lucide only */}
       <section className="bg-white px-4 pb-3 pt-3">
         <div className="grid grid-cols-4 gap-3">
-          <Quick Icon={RotateCcw} label="สั่งซ้ำ" sub={lastOrder ? lastOrder.store : 'ยังไม่มี'} />
-          <Quick Icon={Bookmark} label="รายการโปรด" sub={`${favs.size} ร้าน`} />
-          <Quick Icon={Ticket} label="คูปอง" sub="ลด 10฿" accent />
+          <button onClick={()=>{ if(lastOrder){ const st=stores.find(x=>x.name===lastOrder.store); if(st) onOpen(st.id)}} } className="flex flex-col items-center"><Quick Icon={RotateCcw} label="สั่งซ้ำ" sub={lastOrder ? lastOrder.store : 'ยังไม่มี'} /></button>
+          <button onClick={()=>{ setCat('all'); window.scrollTo({top:0,behavior:'smooth'}); if(favs.size===0) alert('ยังไม่มีร้านโปรด — กดหัวใจที่ร้านเพื่อบันทึก')}} className="flex flex-col items-center"><Quick Icon={Bookmark} label="รายการโปรด" sub={`${favs.size} ร้าน`} /></button>
+          <button onClick={()=>alert('คูปอง: LUNCH10 — ลด 10฿ เมื่อสั่งก่อน 11:30 — ใส่โค้ดตอนชำระเงิน')} className="flex flex-col items-center"><Quick Icon={Ticket} label="คูปอง" sub="ลด 10฿" accent /></button>
           <Quick Icon={Crown} label="พรีเมียม" sub="ฟรีค่าส่ง" />
         </div>
       </section>
@@ -177,7 +179,7 @@ function Home({stores,loading,onOpen}:{stores:StoreType[];loading:boolean;onOpen
           <div className="no-scrollbar flex gap-3 overflow-x-auto pb-1">
             {popular.slice(0,8).map(m=>(
               <div key={m.id} className="w-[148px] shrink-0 overflow-hidden rounded-[12px] border border-[var(--color-border)] bg-white card-shadow">
-                {m.image_url ? <img src={m.image_url} alt={m.name} className="h-[96px] w-full object-cover" loading="lazy" /> : <div className="flex h-[96px] items-center justify-center bg-[#f3f3f3] text-sm font-bold text-[var(--color-text-2)]">{m.name.slice(0,2)}</div>}
+                <>{m.image_url ? <><img src={m.image_url} alt={m.name} className="h-[96px] w-full object-cover" loading="lazy" onError={onImgErr} /><div style={{display:"none"}} className="flex h-[96px] items-center justify-center bg-[#f3f3f3] text-sm font-bold text-[var(--color-text-2)]">{m.name.slice(0,2)}</div></> : <div className="flex h-[96px] items-center justify-center bg-[#f3f3f3] text-sm font-bold text-[var(--color-text-2)]">{m.name.slice(0,2)}</div>}</>
                 <div className="p-2.5">
                   <p className="line-clamp-1 text-sm font-semibold leading-tight">{m.name}</p>
                   <p className="mt-0.5 text-xs text-[var(--color-text-2)]">{m.category}</p>
@@ -203,7 +205,7 @@ function Home({stores,loading,onOpen}:{stores:StoreType[];loading:boolean;onOpen
             return (
               <button key={s.id} onClick={()=>onOpen(s.id)} className="card-shadow flex gap-3 rounded-[12px] border border-[var(--color-border)] bg-white p-3 text-left transition hover:card-shadow-hover">
                 <div className="relative flex h-[84px] w-[84px] shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-[#f3f3f3] ring-1 ring-[var(--color-border)]">
-                  {s.image_url ? <img src={s.image_url} alt={s.name} className="h-full w-full object-cover" loading="lazy" /> : <span className="text-sm font-bold text-[var(--color-text-2)]">{s.name.slice(0,2)}</span>}
+                  {s.image_url ? <><img src={s.image_url} alt={s.name} className="h-full w-full object-cover" loading="lazy" onError={onImgErr} /><span style={{display:"none"}} className="absolute inset-0 flex items-center justify-center text-sm font-bold text-[var(--color-text-2)]">{s.name.slice(0,2)}</span></> : <span className="text-sm font-bold text-[var(--color-text-2)]">{s.name.slice(0,2)}</span>}
                   <span className="absolute bottom-1 left-1 rounded-full bg-white px-1.5 py-0.5 text-[10px] font-bold tracking-wide ring-1 ring-[var(--color-border)]">฿25 • ส่งฟรี</span>
                   {!s.is_open && <span className="absolute inset-0 flex items-center justify-center bg-white/80 text-xs font-bold backdrop-blur-[1px]">ปิด</span>}
                 </div>

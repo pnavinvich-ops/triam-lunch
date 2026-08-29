@@ -3,6 +3,8 @@ import { ChevronLeft, Plus, Minus, Clock, MapPin, CheckCircle2, Package, Star, H
 import { supabase, type MenuItem, type Store } from '../lib/supabase'
 import { useCart } from '../lib/cart'
 
+const onImgErr=(e:React.SyntheticEvent<HTMLImageElement>)=>{(e.currentTarget.style.display='none'); const f=e.currentTarget.nextElementSibling as HTMLElement|null; if(f) f.style.display='flex'}
+
 export default function StorePage({ id, onBack }: { id: string; onBack: () => void }) {
   const [store, setStore] = useState<Store | null>(null)
   const [items, setItems] = useState<MenuItem[]>([])
@@ -35,14 +37,14 @@ export default function StorePage({ id, onBack }: { id: string; onBack: () => vo
       <div className="sticky top-0 z-20 flex items-center gap-2 border-b border-[var(--color-border)] bg-white px-3 py-2.5">
         <button onClick={onBack} className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-white"><ChevronLeft size={18} /></button>
         <p className="min-w-0 flex-1 truncate text-sm font-semibold">{store.name}</p>
-        <button className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-white"><Heart size={16} /></button>
-        <button className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-white"><Share2 size={16} /></button>
+        <button onClick={()=>{ const favs=new Set(JSON.parse(localStorage.getItem('tl_favs')??'[]')); favs.has(id)?favs.delete(id):favs.add(id); localStorage.setItem('tl_favs',JSON.stringify([...favs])); alert(favs.has(id)?'บันทึกเป็นร้านโปรดแล้ว':'ลบจากรายการโปรดแล้ว')}} className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-white"><Heart size={16} /></button>
+        <button onClick={()=>{ if(navigator.share) navigator.share({title:store.name, text:store.description, url:location.href}); else { navigator.clipboard.writeText(location.href); alert('คัดลอกลิงก์แล้ว')}} } className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-white"><Share2 size={16} /></button>
       </div>
 
       {/* Store header — flat white card, no hero gradient */}
       <section className="border-b border-[var(--color-border)] bg-white px-4 pb-4 pt-4">
         <div className="flex gap-3">
-          {store.image_url ? <img src={store.image_url} alt={store.name} className="h-14 w-14 shrink-0 rounded-[12px] object-cover ring-1 ring-[var(--color-border)]" loading="lazy" /> : <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] border border-[var(--color-border)] bg-[#f3f3f3] text-sm font-bold text-[var(--color-text-2)]">{store.name.slice(0,2)}</div>}
+          {store.image_url ? <img src={store.image_url} alt={store.name} className="h-14 w-14 shrink-0 rounded-[12px] object-cover ring-1 ring-[var(--color-border)]" loading="lazy" onError={onImgErr} /> : <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] border border-[var(--color-border)] bg-[#f3f3f3] text-sm font-bold text-[var(--color-text-2)]">{store.name.slice(0,2)}</div>}
           <div className="min-w-0 flex-1">
             <h1 className="text-[16px] font-bold leading-tight tracking-tight">{store.name}</h1>
             {store.description && <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-[var(--color-text-2)]">{store.description}</p>}
@@ -131,7 +133,7 @@ function FoodRow({item,disabled}:{item:MenuItem;disabled?:boolean}){
         <p className="mt-1 flex items-center gap-1 text-[11px] text-[var(--color-text-3)]"><Star size={10} className="fill-amber-400 text-amber-400" /> 4.8 · 50+ สั่งแล้ว</p>
       </div>
       <div className="flex w-[96px] shrink-0 flex-col items-stretch gap-2">
-        {item.image_url ? <img src={item.image_url} alt={item.name} className="h-[72px] w-[96px] shrink-0 rounded-[10px] object-cover ring-1 ring-[var(--color-border)]" loading="lazy" /> : <div className="flex h-[72px] w-[96px] shrink-0 items-center justify-center rounded-[10px] bg-[#f3f3f3] text-xs font-bold text-[var(--color-text-3)] ring-1 ring-[var(--color-border)]">{item.name.slice(0,2)}</div>}
+        {item.image_url ? <img src={item.image_url} alt={item.name} className="h-[72px] w-[96px] shrink-0 rounded-[10px] object-cover ring-1 ring-[var(--color-border)]" loading="lazy" onError={onImgErr} /> : <div className="flex h-[72px] w-[96px] shrink-0 items-center justify-center rounded-[10px] bg-[#f3f3f3] text-xs font-bold text-[var(--color-text-3)] ring-1 ring-[var(--color-border)]">{item.name.slice(0,2)}</div>}
         {inCart>0 ? (
           <span className="flex items-center justify-between rounded-full bg-[var(--color-text)] p-1 text-white">
             <button onClick={()=>useCart.getState().setQty(item.id, inCart-1)} className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15"><Minus size={14} /></button>
