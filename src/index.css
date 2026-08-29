@@ -1,34 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: #fff4ed;
-  --color-brand-100: #ffe6d5;
-  --color-brand-200: #feccaa;
-  --color-brand-500: #f97316;
-  --color-brand-600: #ea580c;
-  --color-brand-700: #c2410c;
+  --color-brand-500: #ff5722;
+  --color-brand-600: #f4511e;
+  --color-brand-50:  #fff3e0;
 }
 
 html, body { overscroll-behavior-y: none; }
 body {
   -webkit-tap-highlight-color: transparent;
-  font-family: 'IBM Plex Sans Thai', 'Noto Sans Thai', system-ui, -apple-system, sans-serif;
-  background: #f3f4f6;
-  color: #191919;
+  font-family: 'Inter', 'IBM Plex Sans Thai', system-ui, -apple-system, sans-serif;
+  background: #f5f5f5;
+  color: #1a1a1a;
 }
+#root { max-width: 480px; margin: 0 auto; min-height: 100dvh; background: #f5f5f5; }
+@media (min-width: 520px) { #root { box-shadow: 0 0 32px rgba(0,0,0,.08); } }
 
-#root { max-width: 480px; margin: 0 auto; min-height: 100dvh; background: #f3f4f6; }
-@media (min-width: 520px) { #root { box-shadow: 0 0 48px rgba(0,0,0,.14); } }
-
-.card-pop:active { opacity: .85; transform: scale(.99); transition: all .1s; }
-
+.card-pop:active { transform: scale(.98); opacity: .92; }
 .skeleton { @apply animate-pulse rounded-xl bg-neutral-200; }
-
-@keyframes slideUp { from { transform: translateY(32px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
-.sheet-in { animation: slideUp .22s cubic-bezier(.2,.8,.2,1); }
-@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-.fade-in { animation: fadeIn .16s ease; }
-
-.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar::-webkit-scrollbar { display:none; }
 .no-scrollbar { scrollbar-width: none; }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* Grab pink banner gradient */
+.grab-pink { background: linear-gradient(135deg, #ff6b9d 0%, #ff4d6d 50%, #ff5722 100%); }
+.store-card-shadow { box-shadow: 0 1px 8px rgba(0,0,0,.06); }
