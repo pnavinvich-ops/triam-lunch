@@ -57,7 +57,7 @@ export default function StorePage({ id, onBack, onTrack }: { id: string; onBack:
     <div className="min-h-dvh bg-[var(--color-bg)]">
       <div className="relative">
         <div className="relative h-[240px] w-full overflow-hidden bg-[var(--color-bg-subtle)]">
-          {store.image_url ? <><img src={store.image_url} alt={store.name} className="h-full w-full object-cover" onError={onImgErr} /><div style={{display:"none"}} className="absolute inset-0 flex items-center justify-center bg-[var(--color-bg-subtle)] text-2xl font-bold text-[var(--color-text-2)]">{store.name.slice(0,2)}</div></> : <div className="flex h-full w-full items-center justify-center bg-[var(--color-bg-subtle)] text-2xl font-bold text-[var(--color-text-2)]">{store.name.slice(0,2)}</div>}
+          {store.image_url ? <><img src={store.image_url} alt={store.name} className="h-full w-full object-cover" loading="lazy" onError={onImgErr} /><div style={{display:"none"}} className="absolute inset-0 flex items-center justify-center bg-[var(--color-bg-subtle)] text-2xl font-bold text-[var(--color-text-2)]">{store.name.slice(0,2)}</div></> : <div className="flex h-full w-full items-center justify-center bg-[var(--color-bg-subtle)] text-2xl font-bold text-[var(--color-text-2)]">{store.name.slice(0,2)}</div>}
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
           <div className="absolute left-3 right-3 top-3 flex items-center justify-between">
             <button onClick={onBack} aria-label="กลับ" className="pressable flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur ring-1 ring-black/5 active:scale-[0.97]"><ChevronLeft size={18} strokeWidth={1.8} /></button>
@@ -68,14 +68,14 @@ export default function StorePage({ id, onBack, onTrack }: { id: string; onBack:
                   if(has) favs.delete(id); else favs.add(id)
                   localStorage.setItem('tl_favs',JSON.stringify([...favs])); alert(has?'ลบจากรายการโปรดแล้ว':'บันทึกเป็นร้านโปรดแล้ว')
                 }catch{ alert('บันทึกไม่สำเร็จ')}
-              }} className={`pressable flex h-9 w-9 items-center justify-center rounded-full backdrop-blur shadow-sm ring-1 ring-black/5 active:scale-[0.97] ${isFav?'bg-white text-red-500':'bg-white/90 text-[var(--color-text)]'}`}><Heart size={16} fill={isFav?'currentColor':'none'} strokeWidth={1.8} /></button>
+              }} className={`pressable flex h-9 w-9 items-center justify-center rounded-full backdrop-blur shadow-sm ring-1 ring-black/5 active:scale-[0.97] ${isFav?'bg-white text-red-500':'bg-white/90 text-[var(--color-text)]'}`}><Heart size={18} fill={isFav?'currentColor':'none'} strokeWidth={1.8} /></button>
               <button aria-label="แชร์" onClick={async()=>{
                 const url=location.href; const text=`${store.name} — ${store.description??''}`
                 try{
                   if(navigator.share) await navigator.share({title:store.name, text, url})
                   else { await navigator.clipboard.writeText(url); alert('คัดลอกลิงก์แล้ว')}
                 }catch{}
-              }} className="pressable flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur ring-1 ring-black/5 active:scale-[0.97]"><Share2 size={16} strokeWidth={1.8} /></button>
+              }} className="pressable flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur ring-1 ring-black/5 active:scale-[0.97]"><Share2 size={18} strokeWidth={1.8} /></button>
             </div>
           </div>
         </div>
@@ -83,14 +83,14 @@ export default function StorePage({ id, onBack, onTrack }: { id: string; onBack:
           <h1 className="text-display text-[22px]" style={{fontFamily:'var(--font-display)'}}>{store.name}</h1>
           {store.description && <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[var(--color-text-2)]">{store.description}</p>}
           <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs">
-            <Star size={12} className="fill-amber-400 text-amber-400" strokeWidth={1.8} /> {rating} <span className="text-[var(--color-text-3)]">({reviewCount})</span>
+            <Star size={11} className="fill-amber-400 text-amber-400" strokeWidth={1.8} /> {rating} <span className="text-[var(--color-text-3)]">({reviewCount})</span>
             <span className="text-[var(--color-border-strong)]">·</span><span className="text-[var(--color-text-2)]">5–10 นาที</span>
             <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-accent-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-accent-ink)] ring-1 ring-[var(--color-accent)]/15"><ShieldCheck size={11} strokeWidth={1.8} /> รับประกันความสด</span>
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
             <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${store.is_open?'bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)] ring-[var(--color-accent)]/15':'bg-[var(--color-bg-subtle)] text-[var(--color-text-3)] ring-[var(--color-border)]'}`}><span className={`h-1.5 w-1.5 rounded-full ${store.is_open?'bg-[var(--color-accent)]':'bg-[var(--color-text-3)]'}`} />{store.is_open?'เปิดรับออเดอร์':'ปิดแล้ว'}</span>
-            <span className="inline-flex items-center gap-1 text-[var(--color-text-2)]"><Clock size={12} strokeWidth={1.8} />{store.open_time}–{store.close_time}</span>
-            {store.location && <span className="inline-flex items-center gap-1 text-[var(--color-text-2)]"><MapPin size={12} strokeWidth={1.8} />{store.location}</span>}
+            <span className="inline-flex items-center gap-1 text-[var(--color-text-2)]"><Clock size={18} strokeWidth={1.8} />{store.open_time}–{store.close_time}</span>
+            {store.location && <span className="inline-flex items-center gap-1 text-[var(--color-text-2)]"><MapPin size={18} strokeWidth={1.8} />{store.location}</span>}
           </div>
         </section>
       </div>
@@ -99,9 +99,9 @@ export default function StorePage({ id, onBack, onTrack }: { id: string; onBack:
       {cart.storeId && cart.storeId!==id && <div className="mx-3 mt-3 flex items-center justify-between rounded-[12px] border border-[var(--color-border)] bg-white px-3.5 py-2.5 text-sm card-shadow"><span className="font-medium">ตะกร้ามีเมนูจากร้านอื่น</span><button onClick={()=>{ if(confirm('ล้างตะกร้าเดิม?')) cart.clear()}} className="pressable font-semibold text-[var(--color-accent)] active:scale-[0.97]">ล้าง</button></div>}
 
       <div className="no-scrollbar flex gap-2 overflow-x-auto bg-white px-3 py-2.5">
-        <button onClick={()=>alert('ส่วนลด 10฿ — ใช้ได้เมื่อสั่งก่อน 11:30 น. รับที่ร้าน จ่ายเงินสด · ระบบจะหักอัตโนมัติตอนชำระเงิน')} className="pressable shrink-0 rounded-full bg-[var(--color-text)] px-3 py-1.5 text-xs font-semibold text-white active:scale-[0.97]">ส่วนลด 10฿ · สั่งล่วงหน้า</button>
-        <button onClick={()=>alert('รับที่ร้าน — มารับตรงเวลา ไม่ต้องรอคิว')} className="pressable shrink-0 rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium active:scale-[0.97]">รับที่ร้าน · ไม่รอคิว</button>
-        <button onClick={()=>alert('ชำระเงินสดที่ร้าน — ไม่ต้องโอนล่วงหน้า')} className="pressable shrink-0 rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium active:scale-[0.97]">จ่ายเงินสด</button>
+        <button onClick={()=>alert('ส่วนลด 10฿ — ใช้ได้เมื่อสั่งก่อน 11:30 น. รับที่ร้าน จ่ายเงินสด · ระบบจะหักอัตโนมัติตอนชำระเงิน')} className="pressable min-h-[44px] shrink-0 rounded-full bg-[var(--color-text)] px-3 py-2 text-xs font-semibold text-white active:scale-[0.97]">ส่วนลด 10฿ · สั่งล่วงหน้า</button>
+        <button onClick={()=>alert('รับที่ร้าน — มารับตรงเวลา ไม่ต้องรอคิว')} className="pressable min-h-[44px] shrink-0 rounded-full border border-[var(--color-border)] bg-white px-3 py-2 text-xs font-medium active:scale-[0.97]">รับที่ร้าน · ไม่รอคิว</button>
+        <button onClick={()=>alert('ชำระเงินสดที่ร้าน — ไม่ต้องโอนล่วงหน้า')} className="pressable min-h-[44px] shrink-0 rounded-full border border-[var(--color-border)] bg-white px-3 py-2 text-xs font-medium active:scale-[0.97]">จ่ายเงินสด</button>
       </div>
 
       <div className="no-scrollbar sticky top-0 z-10 flex gap-5 overflow-x-auto border-b border-[var(--color-border)] bg-white/95 px-4 backdrop-blur">
@@ -121,10 +121,10 @@ export default function StorePage({ id, onBack, onTrack }: { id: string; onBack:
         </div>
 
         <section className="mt-4 rounded-[16px] border border-[var(--color-border)] bg-white p-4 card-shadow">
-          <h3 className="flex items-center gap-1.5 text-sm font-bold" style={{fontFamily:'var(--font-display)'}}><Info size={14} strokeWidth={1.8} /> ข้อมูลร้าน</h3>
+          <h3 className="flex items-center gap-1.5 text-sm font-bold" style={{fontFamily:'var(--font-display)'}}><Info size={18} strokeWidth={1.8} /> ข้อมูลร้าน</h3>
           <p className="mt-1.5 text-xs leading-relaxed text-[var(--color-text-2)]">{store.description || 'อาหารสดใหม่ทุกวัน รับออเดอร์ล่วงหน้า มารับตรงเวลาได้เลย'}</p>
           <div className="mt-3 flex flex-wrap gap-2">{(store.pickup_slots??[]).map(s=> <span key={s} className="rounded-full border border-[var(--color-border)] bg-[var(--color-bg-subtle)] px-3 py-1.5 text-xs font-semibold tabular-nums">{s} น.</span>)}</div>
-          <button onClick={()=>setShowInfo(true)} className="pressable mt-3 flex w-full items-center justify-between rounded-[12px] border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm font-medium active:scale-[0.97]">ดูข้อมูลเพิ่มเติม <ChevronRight size={16} strokeWidth={1.8} className="text-[var(--color-text-3)]" /></button>
+          <button onClick={()=>setShowInfo(true)} className="pressable mt-3 flex min-h-[44px] w-full items-center justify-between rounded-[12px] border border-[var(--color-border)] bg-white px-3 py-3 text-sm font-medium active:scale-[0.97]">ดูข้อมูลเพิ่มเติม <ChevronRight size={18} strokeWidth={1.8} className="text-[var(--color-text-3)]" /></button>
         </section>
         <p className="py-8 text-center text-[11px] font-medium tracking-wide text-[var(--color-text-3)]">TRIAM LUNCH</p>
       </div>
@@ -135,7 +135,7 @@ export default function StorePage({ id, onBack, onTrack }: { id: string; onBack:
           <div className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-[480px] bg-[#111827] px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-3">
             <button onClick={()=> store.is_open ? setCheckout(true) : alert('ร้านปิดรับออเดอร์ — ยังชำระไม่ได้')} disabled={!store.is_open} className="pressable flex w-full items-center justify-between rounded-full bg-white px-2 py-2 text-sm font-semibold text-[#111827] active:scale-[0.97] disabled:bg-[#EDEEF0] disabled:text-[var(--color-text-3)]">
               <span className="flex items-center gap-3"><span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-[#111827] text-sm tabular-nums text-white">{cartCount}</span> {store.is_open?'ดูตะกร้า':'ร้านปิด'}</span>
-              <span className="flex items-center gap-2 pr-1"><span className="tabular-nums">฿{discountApplies?discountedTotal.toFixed(0):cartTotal.toFixed(0)}</span><span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#111827] text-white"><ChevronRight size={14} strokeWidth={1.8} /></span></span>
+              <span className="flex items-center gap-2 pr-1"><span className="tabular-nums">฿{discountApplies?discountedTotal.toFixed(0):cartTotal.toFixed(0)}</span><span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#111827] text-white"><ChevronRight size={18} strokeWidth={1.8} /></span></span>
             </button>
             <p className="py-1 text-center text-[11px] text-white/60">{store.is_open?'รับที่ร้าน · ชำระเงินสด':'เปิด '+store.open_time+' น.'} {discountApplies && cartTotal>0 ? '· ลด 10฿ อัตโนมัติ' : ''}</p>
           </div>
@@ -146,7 +146,7 @@ export default function StorePage({ id, onBack, onTrack }: { id: string; onBack:
       </BottomSheet>
       <BottomSheet open={showInfo} onClose={()=>setShowInfo(false)} title={store.name}>
         <p className="text-sm leading-relaxed text-[var(--color-text-2)]">{store.description || '—'}</p>
-        <div className="mt-3 grid gap-2 text-sm"><p className="flex items-center gap-2"><Clock size={14} strokeWidth={1.8} /> {store.open_time}–{store.close_time}</p>{store.location && <p className="flex items-center gap-2"><MapPin size={14} strokeWidth={1.8} />{store.location}</p>}<p className="flex items-center gap-2"><Package size={14} strokeWidth={1.8} /> รอบรับ: {(store.pickup_slots??[]).join(' · ') || '—'}</p></div>
+        <div className="mt-3 grid gap-2 text-sm"><p className="flex items-center gap-2"><Clock size={18} strokeWidth={1.8} /> {store.open_time}–{store.close_time}</p>{store.location && <p className="flex items-center gap-2"><MapPin size={18} strokeWidth={1.8} />{store.location}</p>}<p className="flex items-center gap-2"><Package size={18} strokeWidth={1.8} /> รอบรับ: {(store.pickup_slots??[]).join(' · ') || '—'}</p></div>
         <div className="mt-4 rounded-[12px] bg-[var(--color-accent-soft)] px-3.5 py-3 ring-1 ring-[var(--color-accent)]/15"><p className="text-xs font-medium text-[var(--color-accent-ink)]">สั่งล่วงหน้า มารับตรงเวลา ไม่ต้องต่อคิว — จ่ายเงินสดที่ร้าน</p></div>
       </BottomSheet>
     </div>
@@ -174,7 +174,7 @@ function FoodRow({item, storeId, storeOpen}:{item:MenuItem; storeId:string; stor
         {item.description && <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-[var(--color-text-2)]">{item.description}</p>}
         {item.daily_note && <p className="mt-1 text-xs font-semibold text-[var(--color-accent)]">{item.daily_note}</p>}
         <p className="mt-2 text-[15px] font-bold tabular-nums">฿{Number(item.price_thb).toFixed(0)}</p>
-        <p className="mt-1 flex items-center gap-1 text-[11px] text-[var(--color-text-3)]"><Star size={10} className="fill-amber-400 text-amber-400" strokeWidth={1.8} /> 4.8 · 50+ สั่งแล้ว</p>
+        <p className="mt-1 flex items-center gap-1 text-[11px] text-[var(--color-text-2)]"><Star size={11} className="fill-amber-400 text-amber-400" strokeWidth={1.8} /> 4.8 · 50+ สั่งแล้ว</p>
       </div>
       <div className="flex w-[88px] shrink-0 flex-col items-stretch gap-2">
         <div className="relative h-[88px] w-[88px] overflow-hidden rounded-[12px] bg-[var(--color-bg-subtle)] ring-1 ring-[var(--color-border)]">
@@ -183,12 +183,12 @@ function FoodRow({item, storeId, storeOpen}:{item:MenuItem; storeId:string; stor
         </div>
         {inCart>0 ? (
           <span className="flex items-center justify-between rounded-full bg-[var(--color-text)] p-1 text-white">
-            <button onClick={()=>cart.setQty(item.id, inCart-1)} aria-label="ลดจำนวน" className="pressable flex h-7 w-7 items-center justify-center rounded-full bg-white/15 active:scale-[0.97]"><Minus size={14} strokeWidth={1.8} /></button>
+            <button onClick={()=>cart.setQty(item.id, inCart-1)} aria-label="ลดจำนวน" className="pressable flex h-8 w-8 items-center justify-center rounded-full bg-white/15 active:scale-[0.97]"><Minus size={18} strokeWidth={1.8} /></button>
             <span className="min-w-4 text-center text-sm font-bold tabular-nums">{inCart}</span>
-            <button onClick={()=>{ if(blockedByStore){ if(confirm('ตะกร้ามีเมนูจากร้านอื่น — ล้างเดิมแล้วเพิ่มเมนูนี้?')){cart.clear(); cart.add(item)} return } cart.add(item)}} aria-label="เพิ่มจำนวน" className="pressable flex h-7 w-7 items-center justify-center rounded-full bg-white text-[var(--color-text)] active:scale-[0.97]"><Plus size={14} strokeWidth={1.8} /></button>
+            <button onClick={()=>{ if(blockedByStore){ if(confirm('ตะกร้ามีเมนูจากร้านอื่น — ล้างเดิมแล้วเพิ่มเมนูนี้?')){cart.clear(); cart.add(item)} return } cart.add(item)}} aria-label="เพิ่มจำนวน" className="pressable flex h-8 w-8 items-center justify-center rounded-full bg-white text-[var(--color-text)] active:scale-[0.97]"><Plus size={18} strokeWidth={1.8} /></button>
           </span>
         ) : (
-          <button disabled={disabled && !blockedByStore} onClick={handleAdd} className="pressable rounded-full bg-[var(--color-accent)] py-2 text-xs font-bold text-white shadow-sm active:scale-[0.97] disabled:bg-[#EDEEF0] disabled:text-[var(--color-text-3)] disabled:shadow-none">{blockedByStore?'ล้างแล้วเพิ่ม':'เพิ่ม'}</button>
+          <button disabled={disabled && !blockedByStore} onClick={handleAdd} className="pressable min-h-[44px] rounded-full bg-[var(--color-accent)] py-3 text-xs font-bold text-white shadow-sm active:scale-[0.97] disabled:bg-[#EDEEF0] disabled:text-[var(--color-text-3)] disabled:shadow-none">{blockedByStore?'ล้างแล้วเพิ่ม':'เพิ่ม'}</button>
         )}
       </div>
     </div>
@@ -242,7 +242,7 @@ function CheckoutSheet({ store, onClose, discountedTotal, discountApplies, onTra
         <h2 className="mt-3 text-lg font-bold tracking-tight" style={{fontFamily:'var(--font-display)'}}>สั่งสำเร็จ</h2>
         <p className="mt-1 text-sm text-[var(--color-text-2)]">รับที่ร้าน {slot} น. · จ่ายเงินสด {discountApplies ? '· ลด 10฿ แล้ว' : ''}</p>
         <div className="my-5 rounded-[12px] border border-dashed border-[var(--color-border)] bg-[#fafafa] py-6"><p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-3)]">รหัสรับอาหาร</p><p className="font-mono text-[34px] font-bold tracking-[0.12em]">{code}</p><p className="text-xs text-[var(--color-text-2)]">แคปหน้าจอนี้แล้วยื่นให้ร้าน</p>
-          <button onClick={async()=>{ await navigator.clipboard.writeText(code); alert('คัดลอกรหัสแล้ว')}} className="pressable mt-3 inline-flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-semibold active:scale-[0.97]"><Copy size={12} strokeWidth={1.8} /> คัดลอกรหัส</button>
+          <button onClick={async()=>{ await navigator.clipboard.writeText(code); alert('คัดลอกรหัสแล้ว')}} className="pressable mt-3 inline-flex min-h-[44px] items-center gap-1 rounded-full border border-[var(--color-border)] bg-white px-3 py-2 text-xs font-semibold active:scale-[0.97]"><Copy size={18} strokeWidth={1.8} /> คัดลอกรหัส</button>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <button onClick={onClose} className="pressable rounded-full border border-[var(--color-border)] bg-white py-3.5 text-sm font-semibold active:scale-[0.97]">อยู่หน้านี้</button>

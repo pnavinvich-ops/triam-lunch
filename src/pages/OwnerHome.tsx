@@ -22,8 +22,8 @@ export default function OwnerHome({ onBackHome }: { onBackHome: () => void }) {
   return (
     <div className="min-h-dvh bg-[var(--color-bg)]">
       <header className="border-b border-[var(--color-border)] bg-white px-4 pb-4 pt-3">
-        <button onClick={onBackHome} className="pressable -ml-1 flex items-center gap-1 py-1 pr-2 text-[15px] font-medium text-[var(--color-text-2)] transition active:scale-[0.97]">
-          <ChevronLeft size={20} strokeWidth={1.8} /> กลับ
+        <button onClick={onBackHome} className="pressable -ml-1 flex min-h-[44px] items-center gap-1 py-1 pr-2 text-[15px] font-medium text-[var(--color-text-2)] transition active:scale-[0.97]">
+          <ChevronLeft size={18} strokeWidth={1.8} /> กลับ
         </button>
         <h1 className="text-display mt-1">สำหรับร้านค้า</h1>
         <p className="mt-0.5 text-sm text-[var(--color-text-2)]">จัดการเมนูและออเดอร์ของร้านคุณ</p>
@@ -32,12 +32,12 @@ export default function OwnerHome({ onBackHome }: { onBackHome: () => void }) {
       {mode === 'ask' && (
         <div className="grid grid-cols-2 gap-2.5 p-4">
           <button onClick={() => setMode('login')} className="pressable flex flex-col gap-2 rounded-[16px] border border-[var(--color-border)] bg-white p-5 text-left card-shadow transition active:scale-[0.97]">
-            <StoreIcon size={22} strokeWidth={1.8} className="text-[#111827]" />
+            <StoreIcon size={20} strokeWidth={1.8} className="text-[#111827]" />
             <span className="text-sm font-semibold">เข้าสู่ระบบ</span>
             <span className="text-xs leading-snug text-[var(--color-text-2)]">มีร้านอยู่แล้ว</span>
           </button>
           <button onClick={() => setMode('register')} className="pressable flex flex-col gap-2 rounded-[16px] border border-[var(--color-border)] bg-white p-5 text-left card-shadow transition active:scale-[0.97]">
-            <ClipboardList size={22} strokeWidth={1.8} className="text-[#111827]" />
+            <ClipboardList size={20} strokeWidth={1.8} className="text-[#111827]" />
             <span className="text-sm font-semibold">สมัครร้านใหม่</span>
             <span className="text-xs leading-snug text-[var(--color-text-2)]">ฟรี ใช้เวลาไม่ถึงนาที</span>
           </button>
@@ -76,8 +76,8 @@ function Login({ onDone, onCancel }: { onDone: (s: Store) => void; onCancel: () 
       <input value={name} onChange={(e) => setName(e.target.value)} placeholder="ชื่อร้าน" className={input} />
       <input value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))} placeholder="PIN ของร้าน" type="password" inputMode="numeric" className={`${input} tracking-[0.35em]`} />
       {err && <p className="rounded-[12px] bg-red-50 px-3 py-2 text-[13px] font-medium text-red-600">{err}</p>}
-      <button onClick={go} className="pressable mt-1 rounded-[12px] bg-[#111827] py-3 text-[15px] font-semibold text-white transition active:scale-[0.97]">เข้าสู่ระบบ</button>
-      <button onClick={onCancel} className="pressable py-1 text-sm font-medium text-[var(--color-text-3)] transition active:scale-[0.97]">ยกเลิก</button>
+      <button onClick={go} className="pressable mt-1 min-h-[44px] rounded-[12px] bg-[#111827] py-3 text-[15px] font-semibold text-white transition active:scale-[0.97]">เข้าสู่ระบบ</button>
+      <button onClick={onCancel} className="pressable min-h-[44px] py-2 text-sm font-medium text-[var(--color-text-2)] transition active:scale-[0.97]">ยกเลิก</button>
     </div>
   )
 }
@@ -109,10 +109,10 @@ function Register({ onCancel }: { onCancel: () => void }) {
         <input value={f.close_time} onChange={(e) => setF({ ...f, close_time: e.target.value })} placeholder="ปิด 13:00" className={input} />
       </div>
       <input value={f.pin} onChange={(e) => setF({ ...f, pin: e.target.value.replace(/\D/g, '') })} placeholder="ตั้ง PIN (ตัวเลข 4 หลักขึ้นไป)" type="password" inputMode="numeric" className={`${input} tracking-[0.35em]`} />
-      <button onClick={go} disabled={busy} className="pressable mt-1 rounded-[12px] bg-[#111827] py-3 text-[15px] font-semibold text-white transition active:scale-[0.97] disabled:opacity-50">
+      <button onClick={go} disabled={busy} className="pressable mt-1 min-h-[44px] rounded-[12px] bg-[#111827] py-3 text-[15px] font-semibold text-white transition active:scale-[0.97] disabled:opacity-50">
         {busy ? 'กำลังสร้าง…' : 'สร้างร้าน'}
       </button>
-      <button onClick={onCancel} className="pressable py-1 text-sm font-medium text-[var(--color-text-3)] transition active:scale-[0.97]">ยกเลิก</button>
+      <button onClick={onCancel} className="pressable min-h-[44px] py-2 text-sm font-medium text-[var(--color-text-2)] transition active:scale-[0.97]">ยกเลิก</button>
     </div>
   )
 }
@@ -141,7 +141,7 @@ function OwnerDash({ store, onLogout, onStore }: { store: Store; onLogout: () =>
             <h1 className="truncate text-[20px] font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>{store.name}</h1>
             <p className="text-xs text-[var(--color-text-2)]">โหมดร้านค้า</p>
           </div>
-          <button onClick={onLogout} className="pressable rounded-[12px] border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-text-2)] transition active:scale-[0.97]">ออกจากระบบ</button>
+          <button onClick={onLogout} className="pressable min-h-[44px] rounded-[12px] border border-[var(--color-border)] bg-white px-3 py-2 text-xs font-medium text-[var(--color-text-2)] transition active:scale-[0.97]">ออกจากระบบ</button>
         </div>
         <button onClick={toggleOpen}
           className={`pressable mt-3 flex w-full items-center justify-between rounded-[16px] border px-4 py-3 text-left transition active:scale-[0.97] ${store.is_open ? 'border-[var(--color-accent)]/20 bg-[var(--color-accent-soft)]' : 'border-[var(--color-border)] bg-[var(--color-bg-subtle)]'}`}>
@@ -177,7 +177,7 @@ function OwnerDash({ store, onLogout, onStore }: { store: Store; onLogout: () =>
         <div className="grid grid-cols-3 gap-1 rounded-[12px] bg-[var(--color-bg-subtle)] p-1">
           {([['orders', 'ออเดอร์'], ['menu', 'เมนู'], ['settings', 'ตั้งค่า']] as const).map(([k, label]) => (
             <button key={k} onClick={() => setTab(k)}
-              className={`pressable relative rounded-[10px] py-2 text-[13px] font-semibold transition active:scale-[0.97] ${tab === k ? 'bg-white text-[var(--color-text)] shadow-sm border border-[var(--color-border)]' : 'text-[var(--color-text-2)]'}`}>
+              className={`pressable relative min-h-[44px] rounded-[10px] py-2.5 text-[13px] font-semibold transition active:scale-[0.97] ${tab === k ? 'bg-white text-[var(--color-text)] shadow-sm border border-[var(--color-border)]' : 'text-[var(--color-text-2)]'}`}>
               {label}
               {k === 'orders' && pending > 0 && (
                 <span className="absolute right-1.5 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#111827] px-1 text-[10px] font-bold text-white">{pending}</span>
@@ -269,10 +269,10 @@ function OrdersBoard({ storeId, onPendingChange }: { storeId: string; onPendingC
               </div>
               <div className="mt-3 grid gap-2">
                 {step.next
-                  ? <button onClick={() => setStatus(o, step.next!)} className="pressable rounded-[12px] bg-[#111827] py-2.5 text-sm font-semibold text-white transition active:scale-[0.97]">{step.nextLabel}</button>
+                  ? <button onClick={() => setStatus(o, step.next!)} className="pressable min-h-[44px] rounded-[12px] bg-[#111827] py-3 text-sm font-semibold text-white transition active:scale-[0.97]">{step.nextLabel}</button>
                   : null}
                 {o.status !== 'completed' && (
-                  <button onClick={() => setStatus(o, 'cancelled')} className="pressable rounded-[12px] py-2 text-xs font-medium text-[var(--color-text-3)] transition active:scale-[0.97]">ยกเลิกออเดอร์นี้</button>
+                  <button onClick={() => setStatus(o, 'cancelled')} className="pressable min-h-[44px] rounded-[12px] py-2 text-xs font-medium text-[var(--color-text-2)] transition active:scale-[0.97]">ยกเลิกออเดอร์นี้</button>
                 )}
               </div>
             </div>
@@ -307,9 +307,9 @@ function MenuManager({ storeId, onCount }: { storeId: string; onCount?: (n: numb
   return (
     <div>
       {!showAdd && (
-        <button onClick={() => setShowAdd(true)} className="pressable mb-3 flex w-full items-center justify-center gap-2 rounded-[16px] border border-dashed border-[var(--color-border)] bg-white py-3.5 text-sm font-semibold text-[#111827] transition active:scale-[0.97]">
-          <Plus size={16} strokeWidth={1.8} /> เพิ่มเมนูใหม่
-        </button>
+          <button onClick={() => setShowAdd(true)} className="pressable mb-3 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-[16px] border border-dashed border-[var(--color-border)] bg-white py-3.5 text-sm font-semibold text-[#111827] transition active:scale-[0.97]">
+            <Plus size={18} strokeWidth={1.8} /> เพิ่มเมนูใหม่
+          </button>
       )}
       {showAdd && (
         <div className="mb-3 grid gap-2.5 rounded-[16px] border border-[var(--color-border)] bg-white p-4 card-shadow">
@@ -323,8 +323,8 @@ function MenuManager({ storeId, onCount }: { storeId: string; onCount?: (n: numb
           <input value={f.daily_note} onChange={(e) => setF({ ...f, daily_note: e.target.value })} placeholder="โน้ตประจำวัน (ไม่บังคับ)" className={input} />
           <input value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} placeholder="คำอธิบาย (ไม่บังคับ)" className={input} />
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={() => setShowAdd(false)} className="pressable rounded-[12px] bg-[var(--color-bg-subtle)] py-2.5 text-sm font-semibold text-[var(--color-text-2)] transition active:scale-[0.97]">ยกเลิก</button>
-            <button onClick={add} className="pressable rounded-[12px] bg-[#111827] py-2.5 text-sm font-semibold text-white transition active:scale-[0.97]">บันทึกเมนู</button>
+            <button onClick={() => setShowAdd(false)} className="pressable min-h-[44px] rounded-[12px] bg-[var(--color-bg-subtle)] py-3 text-sm font-semibold text-[var(--color-text-2)] transition active:scale-[0.97]">ยกเลิก</button>
+            <button onClick={add} className="pressable min-h-[44px] rounded-[12px] bg-[#111827] py-3 text-sm font-semibold text-white transition active:scale-[0.97]">บันทึกเมนู</button>
           </div>
         </div>
       )}
@@ -337,8 +337,8 @@ function MenuManager({ storeId, onCount }: { storeId: string; onCount?: (n: numb
               <p className="text-sm font-semibold tabular-nums text-[var(--color-text)]">฿{Number(it.price_thb).toFixed(0)}</p>
               {it.daily_note && <p className="truncate text-xs font-medium text-[var(--color-accent)]">{it.daily_note}</p>}
             </div>
-            <button onClick={() => toggle(it)} className={`pressable rounded-full px-3 py-1 text-xs font-semibold transition active:scale-[0.97] ${it.available ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)] ring-1 ring-[var(--color-accent)]/15' : 'bg-[var(--color-bg-subtle)] text-[var(--color-text-3)] ring-1 ring-[var(--color-border)]'}`}>{it.available ? 'มีของ' : 'หมด'}</button>
-            <button onClick={() => del(it.id)} className="pressable p-1 text-[var(--color-text-3)] transition hover:text-red-500 active:scale-[0.97]" aria-label="ลบ">✕</button>
+            <button onClick={() => toggle(it)} className={`pressable min-h-[44px] rounded-full px-3 py-2 text-xs font-semibold transition active:scale-[0.97] ${it.available ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)] ring-1 ring-[var(--color-accent)]/15' : 'bg-[var(--color-bg-subtle)] text-[var(--color-text-2)] ring-1 ring-[var(--color-border)]'}`}>{it.available ? 'มีของ' : 'หมด'}</button>
+            <button onClick={() => del(it.id)} className="pressable flex h-8 w-8 items-center justify-center rounded-full text-[var(--color-text-2)] transition hover:text-red-500 active:scale-[0.97]" aria-label="ลบ">✕</button>
           </div>
         ))}
         {items.length === 0 && <p className="py-8 text-center text-sm text-[var(--color-text-3)]">ยังไม่มีเมนู</p>}
@@ -359,7 +359,7 @@ function Settings({ store, onStore }: { store: Store; onStore: (s: Store) => voi
     <div className="grid gap-3 rounded-[16px] border border-[var(--color-border)] bg-white p-4 card-shadow">
       <label className="text-[13px] font-bold" style={{ fontFamily: 'var(--font-display)' }}>เวลารับที่เปิดให้จอง <span className="font-normal text-[var(--color-text-3)]">(คั่นด้วย ,)</span></label>
       <input value={slots} onChange={(e) => setSlots(e.target.value)} className={input} />
-      <button onClick={save} className={`pressable rounded-[12px] py-3 text-sm font-semibold text-white transition active:scale-[0.97] ${saved ? 'bg-[var(--color-accent)]' : 'bg-[#111827]'}`}>
+      <button onClick={save} className={`pressable min-h-[44px] rounded-[12px] py-3 text-sm font-semibold text-white transition active:scale-[0.97] ${saved ? 'bg-[var(--color-accent)]' : 'bg-[#111827]'}`}>
         {saved ? 'บันทึกแล้ว ✓' : 'บันทึก'}
       </button>
       <div className="rounded-[12px] bg-[var(--color-bg-subtle)] p-3 text-xs leading-relaxed text-[var(--color-text-2)]">
@@ -441,7 +441,7 @@ export function TrackOrderView() {
                   </div>
                   {o.status === 'ready' && (
                     <p className="mt-2 flex items-center gap-1.5 rounded-[12px] bg-[var(--color-accent-soft)] px-3 py-2 text-xs font-semibold text-[var(--color-accent-ink)] ring-1 ring-[var(--color-accent)]/15">
-                      <CheckCircle2 size={14} strokeWidth={1.8} /> พร้อมแล้ว — ไปรับที่ร้านได้เลย
+                      <CheckCircle2 size={18} strokeWidth={1.8} /> พร้อมแล้ว — ไปรับที่ร้านได้เลย
                     </p>
                   )}
                   {o.status === 'completed' && (

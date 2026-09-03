@@ -142,8 +142,8 @@ function Home({stores,loading,loadErr,onRetry,onOpen,onGoTrack}:{stores:StoreTyp
       <header className="sticky top-0 z-20 border-b border-[var(--color-border)] bg-white/90 px-4 pb-3 pt-3 backdrop-blur supports-[backdrop-filter]:bg-white/80">
         {/* Row 1: location pill + cart */}
         <div className="flex items-center justify-between gap-2">
-          <button onClick={()=>setShowLocation(true)} aria-label="เลือกจุดรับอาหาร" className="pressable flex items-center gap-2 text-left transition active:scale-[0.97]">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-text)] text-white"><MapPin size={14} strokeWidth={1.8} /></span>
+          <button onClick={()=>setShowLocation(true)} aria-label="เลือกจุดรับอาหาร" className="pressable flex min-h-[44px] items-center gap-2 text-left transition active:scale-[0.97]">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-text)] text-white"><MapPin size={18} strokeWidth={1.8} /></span>
             <span className="leading-tight">
               <span className="block text-[11px] font-medium text-[var(--color-text-2)]">ส่งที่</span>
               <span className="flex items-center gap-1 text-[13px] font-semibold">อาคารโรงอาหาร · ม.4–ม.6 <ChevronRight size={12} strokeWidth={1.8} className="text-[var(--color-text-3)]" /></span>
@@ -159,21 +159,21 @@ function Home({stores,loading,loadErr,onRetry,onOpen,onGoTrack}:{stores:StoreTyp
         {/* Row 2: SearchBar pill + filter */}
         <div className="mt-3 flex items-center gap-2">
           <SearchBar value={q} onChange={onSearch} placeholder="ค้นหาร้านค้า เมนู..." />
-          <button onClick={()=>setShowFilter(true)} aria-label="ตัวกรอง" className={`pressable flex h-10 w-10 items-center justify-center rounded-full border bg-white transition active:scale-[0.97] ${filterOpenOnly||sortBy!=='default'||favOnly?'border-[var(--color-accent)] bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)]':'border-[var(--color-border)]'}`}><SlidersHorizontal size={16} strokeWidth={1.8} /></button>
+          <button onClick={()=>setShowFilter(true)} aria-label="ตัวกรอง" className={`pressable flex h-10 w-10 items-center justify-center rounded-full border bg-white transition active:scale-[0.97] ${filterOpenOnly||sortBy!=='default'||favOnly?'border-[var(--color-accent)] bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)]':'border-[var(--color-border)]'}`}><SlidersHorizontal size={18} strokeWidth={1.8} /></button>
         </div>
         {/* Row 3: segmented control */}
         <div className="mt-3 flex items-center gap-2">
           <div className="flex gap-1 rounded-full bg-[var(--color-bg-subtle)] p-1">
             {(['pickup','preorder'] as const).map(m=>(
-              <button key={m} onClick={()=>setMode(m)} className={`pressable rounded-full px-4 py-1.5 text-xs font-semibold transition active:scale-[0.97] ${mode===m?'bg-[var(--color-text)] text-white shadow-sm':'text-[var(--color-text-2)]'}`}>{m==='pickup'?'รับที่ร้าน':'สั่งล่วงหน้า'}</button>
+              <button key={m} onClick={()=>setMode(m)} className={`pressable min-h-[44px] rounded-full px-4 py-2 text-xs font-semibold transition active:scale-[0.97] ${mode===m?'bg-[var(--color-text)] text-white shadow-sm':'text-[var(--color-text-2)]'}`}>{m==='pickup'?'รับที่ร้าน':'สั่งล่วงหน้า'}</button>
             ))}
           </div>
-          <span className="ml-auto flex items-center gap-1 text-xs font-medium text-[var(--color-text-2)]"><Clock3 size={12} strokeWidth={1.8} /> รอบ {pickupSlotsDisplay}</span>
+          <span className="ml-auto flex items-center gap-1 text-xs font-medium text-[var(--color-text-2)]"><Clock3 size={18} strokeWidth={1.8} /> รอบ {pickupSlotsDisplay}</span>
         </div>
         {recent.length>0 && !qDebounced && (
           <div className="mt-2 flex flex-wrap gap-1.5" role="list" aria-label="ค้นหาล่าสุด">
-            {recent.map(r=> <button key={r} onClick={()=>setQ(r)} className="pressable rounded-full border border-[var(--color-border)] bg-white px-2.5 py-1 text-xs font-medium text-[var(--color-text-2)] transition active:scale-[0.97]">{r}</button>)}
-            <button onClick={()=>{ setRecent([]); try{localStorage.removeItem('tl_recent_q')}catch{} }} className="pressable px-1 text-xs text-[var(--color-text-3)] transition active:scale-[0.97]">ล้าง</button>
+            {recent.map(r=> <button key={r} onClick={()=>setQ(r)} className="pressable min-h-[44px] rounded-full border border-[var(--color-border)] bg-white px-2.5 py-2 text-xs font-medium text-[var(--color-text-2)] transition active:scale-[0.97]">{r}</button>)}
+            <button onClick={()=>{ setRecent([]); try{localStorage.removeItem('tl_recent_q')}catch{} }} className="pressable min-h-[44px] px-2 text-xs font-medium text-[var(--color-text-2)] transition active:scale-[0.97]">ล้าง</button>
           </div>
         )}
       </header>
@@ -199,7 +199,7 @@ function Home({stores,loading,loadErr,onRetry,onOpen,onGoTrack}:{stores:StoreTyp
             <p className="mt-0.5 text-[15px] font-bold leading-tight text-[var(--color-text)]">สั่งล่วงหน้าก่อน 11:30<br/>ลดทันที 10 บาท</p>
             <p className="mt-1 text-xs font-medium text-[var(--color-text-2)]">แตะเพื่อดูเงื่อนไข · จ่ายเงินสดที่ร้าน</p>
           </div>
-          <div className="flex h-16 w-16 items-center justify-center rounded-[16px] bg-white ring-1 ring-[var(--color-border)]"><UtensilsCrossed size={28} strokeWidth={1.8} className="text-[var(--color-accent)]" /></div>
+          <div className="flex h-16 w-16 items-center justify-center rounded-[16px] bg-white ring-1 ring-[var(--color-border)]"><UtensilsCrossed size={20} strokeWidth={1.8} className="text-[var(--color-accent)]" /></div>
         </button>
       </section>
 
@@ -233,7 +233,7 @@ function Home({stores,loading,loadErr,onRetry,onOpen,onGoTrack}:{stores:StoreTyp
           <div className="no-scrollbar flex gap-3 overflow-x-auto pb-1">
             {popular.slice(0,12).map(m=>(
               <button key={m.id} onClick={()=> onOpen(m.store_id)} aria-label={`เปิดร้านของ ${m.name}`} className="pressable w-[148px] shrink-0 overflow-hidden rounded-[16px] border border-[var(--color-border)] bg-white text-left card-shadow transition active:scale-[0.97]">
-                <>{m.image_url ? <><img src={m.image_url} alt={m.name} className="h-[96px] w-full object-cover" loading="lazy" onError={onImgErr} /><div style={{display:"none"}} className="flex h-[96px] items-center justify-center bg-[var(--color-bg-subtle)] text-sm font-bold text-[var(--color-text-2)]">{m.name.slice(0,2)}</div></> : <div className="flex h-[96px] items-center justify-center bg-[var(--color-bg-subtle)] text-sm font-bold text-[var(--color-text-3)]">{m.name.slice(0,2)}</div>}</>
+                <>{m.image_url ? <><div className="relative h-[96px] w-full overflow-hidden bg-[var(--color-bg-subtle)]"><img src={m.image_url} alt={m.name} className="h-full w-full object-cover" loading="lazy" onError={onImgErr} /><div style={{display:"none"}} className="absolute inset-0 flex items-center justify-center bg-[var(--color-bg-subtle)] text-sm font-bold text-[var(--color-text-2)]">{m.name.slice(0,2)}</div></div></> : <div className="flex h-[96px] items-center justify-center bg-[var(--color-bg-subtle)] text-sm font-bold text-[var(--color-text-3)]">{m.name.slice(0,2)}</div>}</>
                 <div className="p-2.5">
                   <p className="line-clamp-1 text-sm font-semibold leading-tight">{m.name}</p>
                   <p className="mt-0.5 text-xs text-[var(--color-text-2)]">{m.category}</p>
@@ -249,7 +249,7 @@ function Home({stores,loading,loadErr,onRetry,onOpen,onGoTrack}:{stores:StoreTyp
       <section id="store-list" className="bg-[var(--color-bg)] px-3 pb-6 pt-3">
         <div className="mb-3 flex items-center justify-between px-1">
           <h2 className="text-display text-[14px]" style={{fontFamily:'var(--font-display)'}}>ร้านแนะนำ</h2>
-          <button onClick={()=>setShowFilter(true)} className="pressable inline-flex items-center gap-1 text-xs font-semibold text-[var(--color-text-2)] transition active:scale-[0.97]"><SlidersHorizontal size={14} strokeWidth={1.8} /> ตัวกรอง</button>
+           <button onClick={()=>setShowFilter(true)} className="pressable inline-flex min-h-[44px] items-center gap-1 text-xs font-semibold text-[var(--color-text-2)] transition active:scale-[0.97]"><SlidersHorizontal size={18} strokeWidth={1.8} /> ตัวกรอง</button>
         </div>
         <p className="mb-2 px-1 text-xs text-[var(--color-text-2)]">{filtered.length} ร้าน · {cat==='all' ? 'ทั้งหมด' : CAT_DEFS.find(c=>c.id===cat)?.label}{filterOpenOnly?' · เปิดอยู่':''}{favOnly?' · ร้านโปรด':''}</p>
         {loadErr && <div className="rounded-[16px] border border-[var(--color-border)] bg-white p-8 text-center card-shadow"><StoreIcon size={28} strokeWidth={1.8} className="mx-auto text-[var(--color-text-3)]" /><p className="mt-2 text-sm font-semibold">โหลดร้านไม่สำเร็จ</p><p className="mt-1 text-xs text-[var(--color-text-2)]">{loadErr}</p><button onClick={onRetry} className="pressable mt-3 rounded-full bg-[var(--color-text)] px-5 py-2.5 text-xs font-semibold text-white transition active:scale-[0.97]">ลองใหม่</button></div>}
@@ -265,13 +265,13 @@ function Home({stores,loading,loadErr,onRetry,onOpen,onGoTrack}:{stores:StoreTyp
                     {s.image_url ? <><img src={s.image_url} alt={s.name} className="h-full w-full object-cover" loading="lazy" onError={onImgErr} /><span style={{display:"none"}} className="absolute inset-0 flex items-center justify-center bg-[var(--color-bg-subtle)] text-lg font-bold text-[var(--color-text-2)]">{s.name.slice(0,2)}</span><div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" /></> : <div className="flex h-full w-full items-center justify-center text-lg font-bold text-[var(--color-text-2)]">{s.name.slice(0,2)}</div>}
                     {!s.is_open && <span className="absolute inset-0 flex items-center justify-center bg-white/75 text-sm font-bold backdrop-blur-[1px]">ปิด</span>}
                   </button>
-                  <button onClick={e=>{e.stopPropagation(); e.preventDefault(); toggleFav(s.id)}} aria-label={isFav?'ลบโปรด':'โปรด'} className={`pressable absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur ring-1 ring-black/5 transition active:scale-[0.97] ${isFav?'bg-white text-red-500':'bg-white/90 text-[var(--color-text-3)]'}`}><Heart size={16} strokeWidth={1.8} fill={isFav?'currentColor':'none'} /></button>
+                  <button onClick={e=>{e.stopPropagation(); e.preventDefault(); toggleFav(s.id)}} aria-label={isFav?'ลบโปรด':'โปรด'} className={`pressable absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur ring-1 ring-black/5 transition active:scale-[0.97] ${isFav?'bg-white text-red-500':'bg-white/90 text-[var(--color-text-3)]'}`}><Heart size={18} strokeWidth={1.8} fill={isFav?'currentColor':'none'} /></button>
                   <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold tabular-nums shadow-sm backdrop-blur"><Star size={11} strokeWidth={1.8} className="fill-amber-400 text-amber-400" /> {r} · {rev}+</span>
                 </div>
                 <button onClick={()=> s.is_open ? onOpen(s.id) : alert('ร้านปิดรับออเดอร์ — ดูเมนูได้อย่างเดียว')} className="pressable block w-full p-3.5 text-left transition active:scale-[0.97]">
                   <h3 className="line-clamp-1 text-[16px] font-semibold leading-tight" style={{fontFamily:'var(--font-display)'}}>{s.name}</h3>
                   {s.description && <p className="mt-0.5 line-clamp-1 text-xs text-[var(--color-text-2)]">{s.description}</p>}
-                  <p className="mt-1.5 flex items-center gap-1.5 text-xs text-[var(--color-text-2)]"><span className={`h-1.5 w-1.5 rounded-full ${s.is_open?'bg-[var(--color-accent)]':'bg-[var(--color-text-3)]'}`} />{s.is_open?'เปิด':'ปิด'} · <Clock3 size={12} strokeWidth={1.8} /> 15 นาที · {s.pickup_slots?.[0]??'11:50'} รับที่ร้าน</p>
+                  <p className="mt-1.5 flex items-center gap-1.5 text-xs text-[var(--color-text-2)]"><span className={`h-1.5 w-1.5 rounded-full ${s.is_open?'bg-[var(--color-accent)]':'bg-[var(--color-text-3)]'}`} />{s.is_open?'เปิด':'ปิด'} · <Clock3 size={18} strokeWidth={1.8} /> 15 นาที · {s.pickup_slots?.[0]??'11:50'} รับที่ร้าน</p>
                   {s.is_open && <span className="mt-2 inline-flex rounded-full bg-[var(--color-accent-soft)] px-2 py-1 text-[11px] font-semibold text-[var(--color-accent-ink)] ring-1 ring-[var(--color-accent)]/15">ลด 10฿ เมื่อสั่งก่อน 11:30</span>}
                 </button>
               </div>
@@ -318,11 +318,11 @@ function Home({stores,loading,loadErr,onRetry,onOpen,onGoTrack}:{stores:StoreTyp
 
       <BottomSheet open={showLocation} onClose={()=>setShowLocation(false)} title="จุดรับอาหาร">
         <div className="rounded-[12px] border border-[var(--color-border)] bg-[#fafafa] p-3.5">
-          <p className="flex items-center gap-2 text-sm font-semibold"><MapPin size={14} strokeWidth={1.8} /> อาคารโรงอาหาร ชั้น 1</p>
+          <p className="flex items-center gap-2 text-sm font-semibold"><MapPin size={18} strokeWidth={1.8} /> อาคารโรงอาหาร ชั้น 1</p>
           <p className="mt-1 text-xs leading-relaxed text-[var(--color-text-2)]">โรงเรียนเตรียมอุดมศึกษาพัฒนาการ · ม.4–ม.6<br/>เปิด 10:00–13:30 · รอบรับ {pickupSlotsDisplay} น.</p>
           <div className="mt-3 flex flex-wrap gap-1.5">{[...new Set(stores.flatMap(s=>s.pickup_slots??[]))].slice(0,6).map(s=> <span key={s} className="rounded-full border border-[var(--color-border)] bg-white px-2.5 py-1 text-xs font-medium tabular-nums">{s} น.</span>)}</div>
         </div>
-        <div className="mt-3 rounded-[12px] bg-[var(--color-accent-soft)] px-3.5 py-3 ring-1 ring-[var(--color-accent)]/15"><p className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-accent-ink)]"><Check size={14} strokeWidth={1.8} /> สั่งล่วงหน้า มารับตรงเวลา ไม่ต้องรอคิว</p></div>
+        <div className="mt-3 rounded-[12px] bg-[var(--color-accent-soft)] px-3.5 py-3 ring-1 ring-[var(--color-accent)]/15"><p className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-accent-ink)]"><Check size={18} strokeWidth={1.8} /> สั่งล่วงหน้า มารับตรงเวลา ไม่ต้องรอคิว</p></div>
         <button onClick={()=>setShowLocation(false)} className="pressable mt-4 w-full rounded-full bg-[var(--color-text)] py-3 text-sm font-semibold text-white transition active:scale-[0.97]">ตกลง</button>
       </BottomSheet>
     </div>
@@ -334,7 +334,7 @@ function SectionHead({title, action, onAction}:{title:string; action?:string; on
 function Quick({Icon,label,sub,accent}:{Icon:typeof RotateCcw;label:string;sub:string;accent?:boolean}){
   return (
     <div className="flex flex-col items-center gap-1.5 text-center">
-      <span className={`flex h-12 w-12 items-center justify-center rounded-full ring-1 ${accent ? 'bg-[var(--color-accent)] text-white ring-[var(--color-accent)]' : 'bg-white text-[var(--color-text)] ring-[var(--color-border)]'}`}><Icon size={18} strokeWidth={1.8} /></span>
+      <span className={`flex h-12 w-12 items-center justify-center rounded-full ring-1 ${accent ? 'bg-[var(--color-accent)] text-white ring-[var(--color-accent)]' : 'bg-white text-[var(--color-text)] ring-[var(--color-border)]'}`}><Icon size={20} strokeWidth={1.8} /></span>
       <span className="text-xs font-semibold leading-none">{label}</span>
       <span className="line-clamp-1 text-[11px] leading-none text-[var(--color-text-2)]">{sub}</span>
     </div>

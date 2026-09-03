@@ -9,7 +9,7 @@ export default function BottomSheet({ open, onClose, title, children }: { open:b
     <div role="dialog" aria-modal="true" aria-label={title} onClick={onClose} className="fixed inset-0 z-40 flex items-end justify-center bg-black/40 backdrop-blur-[2px]">
       <div onClick={e=>e.stopPropagation()} className="max-h-[88dvh] w-full max-w-[480px] overflow-y-auto rounded-t-[20px] bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] shadow-float">
         <div className="mx-auto mb-3 h-1.5 w-9 rounded-full bg-[var(--color-border)]" />
-        {title && <div className="mb-3 flex items-center justify-between"><h3 className="text-[15px] font-bold tracking-tight" style={{fontFamily:'var(--font-display)'}}>{title}</h3><button onClick={onClose} aria-label="ปิด" className="pressable rounded-full border border-[var(--color-border)] p-1.5 active:scale-[0.97]"><X size={16} /></button></div>}
+        {title && <div className="mb-3 flex items-center justify-between"><h3 className="text-[15px] font-bold tracking-tight" style={{fontFamily:'var(--font-display)'}}>{title}</h3><button onClick={onClose} aria-label="ปิด" className="pressable flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-border)] active:scale-[0.97]"><X size={18} strokeWidth={1.8} /></button></div>}
         {children}
       </div>
     </div>

@@ -30,9 +30,9 @@
   --font-body: "Sarabun", "Inter", system-ui, sans-serif;
 }
 
-html { font-family: var(--font-body); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-body { background: var(--color-bg); color: var(--color-text); overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; letter-spacing: -0.011em; }
-#root { max-width: 480px; margin: 0 auto; min-height: 100dvh; background: var(--color-bg); padding-left: env(safe-area-inset-left,0); padding-right: env(safe-area-inset-right,0); }
+html { font-family: var(--font-body); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-x: hidden; }
+body { background: var(--color-bg); color: var(--color-text); overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; letter-spacing: -0.011em; overflow-x: hidden; }
+#root { max-width: 480px; margin: 0 auto; min-height: 100dvh; background: var(--color-bg); padding-left: env(safe-area-inset-left,0); padding-right: env(safe-area-inset-right,0); overflow-x: hidden; }
 @media (min-width: 520px){ #root{ box-shadow: var(--shadow-float); } }
 
 /* Typography scale */
