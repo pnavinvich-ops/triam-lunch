@@ -203,6 +203,9 @@ function CheckoutSheet({ store, onClose, discountedTotal, discountApplies, onTra
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
   const [code, setCode] = useState<string | null>(null)
+  const [couponInput, setCouponInput] = useState('')
+  const [couponApplied, setCouponApplied] = useState(false)
+  const [couponErr, setCouponErr] = useState('')
   const [nameErr,setNameErr]=useState('')
   const [phoneErr,setPhoneErr]=useState('')
   const total = cart.items.reduce((a,i)=>a + i.qty * Number(i.item.price_thb),0)
@@ -263,6 +266,28 @@ function CheckoutSheet({ store, onClose, discountedTotal, discountApplies, onTra
         </ul>
         <div className="mt-2 flex items-center justify-between px-1 text-sm"><span className="text-[var(--color-text-2)]">ยอดรวม</span><span className="tabular-nums font-bold">฿{total.toFixed(0)}</span></div>
         {discountApplies && <div className="flex items-center justify-between px-1 text-sm font-semibold text-[var(--color-accent)]"><span>ส่วนลดสั่งก่อน 11:30</span><span>-฿10</span></div>}
+        {/* coupon code INLINE in cart (top-app pattern) */}
+        <div className="mt-2 rounded-[12px] border border-[var(--color-border)] bg-[#fafafa] p-2.5">
+          {couponApplied ? (
+            <div className="flex items-center justify-between px-1">
+              <span className="text-sm font-bold text-[var(--color-accent-ink)]">LUNCH10 <span className="font-medium text-[var(--color-text-2)]">· ใช้แล้ว</span></span>
+              <button onClick={()=>setCouponApplied(false)} className="pressable text-xs font-medium text-[var(--color-text-2)] active:scale-[0.97]">ลบ</button>
+            </div>
+          ) : (
+            <>
+              <div className="flex gap-2">
+                <input value={couponInput} onChange={e=>{ setCouponInput(e.target.value); setCouponErr('') }} placeholder="โค้ดคูปอง (เช่น LUNCH10)" maxLength={16} aria-label="โค้ดคูปอง" className={`${input} uppercase`} />
+                <button onClick={()=>{
+                  if(couponInput.trim().toUpperCase()==='LUNCH10'){
+                    if(discountApplies){ setCouponApplied(true); setCouponErr('') }
+                    else setCouponErr('LUNCH10 ใช้ได้เมื่อสั่งก่อน 11:30 น.')
+                  } else setCouponErr('โค้ดไม่ถูกต้อง — ลอง LUNCH10')
+                }} className="pressable shrink-0 rounded-[10px] bg-[var(--color-text)] px-4 text-sm font-semibold text-white active:scale-[0.97]">ใช้</button>
+              </div>
+              {couponErr ? <p role="alert" className="mt-1.5 px-1 text-xs text-red-600">{couponErr}</p> : <p className="mt-1.5 px-1 text-[11px] text-[var(--color-text-3)]">มีโค้ด LUNCH10? กรอกเพื่อยืนยันส่วนลด 10฿</p>}
+            </>
+          )}
+        </div>
         <div className="flex items-center justify-between border-t border-[var(--color-border)] px-1 pt-2 text-sm font-bold"><span>ยอดชำระ</span><span className="tabular-nums text-base">฿{discountedTotal.toFixed(0)}</span></div>
         <div className="mt-4 grid gap-2.5">
           <div>

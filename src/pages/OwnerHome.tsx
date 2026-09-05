@@ -17,7 +17,7 @@ export default function OwnerHome({ onBackHome }: { onBackHome: () => void }) {
     }
   }, [])
 
-  if (store && mode === 'dash') return <OwnerDash store={store} onLogout={() => { localStorage.removeItem(KEY); setStore(null); setMode('ask') }} onStore={setStore} />
+  if (store && mode === 'dash') return <OwnerDash store={store} onLogout={() => { localStorage.removeItem(KEY); setStore(null); setMode('ask') }} onStore={setStore} onHome={onBackHome} />
 
   return (
     <div className="min-h-dvh bg-[var(--color-bg)]">
@@ -117,7 +117,7 @@ function Register({ onCancel }: { onCancel: () => void }) {
   )
 }
 
-function OwnerDash({ store, onLogout, onStore }: { store: Store; onLogout: () => void; onStore: (s: Store) => void }) {
+function OwnerDash({ store, onLogout, onStore, onHome }: { store: Store; onLogout: () => void; onStore: (s: Store) => void; onHome: () => void }) {
   const [tab, setTab] = useState<'orders' | 'menu' | 'settings'>('orders')
   const [pending, setPending] = useState(0)
   const [menuCount, setMenuCount] = useState(0)
@@ -137,11 +137,14 @@ function OwnerDash({ store, onLogout, onStore }: { store: Store; onLogout: () =>
     <div className="min-h-dvh bg-[var(--color-bg)] pb-24">
       <header className="border-b border-[var(--color-border)] bg-white px-4 pb-4 pt-3">
         <div className="flex items-center justify-between">
-          <div className="min-w-0">
-            <h1 className="truncate text-[20px] font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>{store.name}</h1>
-            <p className="text-xs text-[var(--color-text-2)]">โหมดร้านค้า</p>
-          </div>
+          <button onClick={onHome} className="pressable -ml-1 flex min-h-[44px] items-center gap-1 py-1 pr-2 text-[15px] font-medium text-[var(--color-text-2)] transition active:scale-[0.97]">
+            <ChevronLeft size={18} strokeWidth={1.8} /> หน้าแรก
+          </button>
           <button onClick={onLogout} className="pressable min-h-[44px] rounded-[12px] border border-[var(--color-border)] bg-white px-3 py-2 text-xs font-medium text-[var(--color-text-2)] transition active:scale-[0.97]">ออกจากระบบ</button>
+        </div>
+        <div className="min-w-0 pt-1">
+          <h1 className="truncate text-[20px] font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>{store.name}</h1>
+          <p className="text-xs text-[var(--color-text-2)]">โหมดร้านค้า</p>
         </div>
         <button onClick={toggleOpen}
           className={`pressable mt-3 flex w-full items-center justify-between rounded-[16px] border px-4 py-3 text-left transition active:scale-[0.97] ${store.is_open ? 'border-[var(--color-accent)]/20 bg-[var(--color-accent-soft)]' : 'border-[var(--color-border)] bg-[var(--color-bg-subtle)]'}`}>
@@ -415,6 +418,12 @@ export function TrackOrderView() {
                   <span className={`ml-auto rounded-full px-2.5 py-0.5 text-xs font-semibold ${cls}`}>{label}</span>
                   <span className="text-xs tabular-nums text-[var(--color-text-2)]">{o.pickup_slot}</span>
                 </div>
+                {!cancelled && o.status!=='completed' && (
+                  <div className="border-b border-dashed border-[var(--color-border)] bg-[#fafafa] px-4 py-3 text-center">
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-3)]">รหัสรับอาหาร</p>
+                    <p className="font-mono text-[28px] font-bold tracking-[0.12em]">{o.order_code}</p>
+                  </div>
+                )}
                 <div className="px-4 py-3">
                   {/* stepper */}
                   <div className="flex items-center gap-1">
@@ -423,8 +432,8 @@ export function TrackOrderView() {
                       const current = i === idx
                       return (
                         <div key={sLabel} className="flex flex-1 items-center gap-1">
-                          <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 text-[11px] font-bold ${cancelled ? 'border-[var(--color-border)] bg-[var(--color-bg-subtle)] text-[var(--color-text-3)]' : past ? 'border-[var(--color-accent)] bg-[var(--color-accent)] text-white' : current ? 'border-[var(--color-accent)] bg-white text-[var(--color-accent)]' : 'border-[var(--color-border)] bg-white text-[var(--color-text-3)]'}`}>{past && !cancelled ? '✓' : i + 1}</span>
-                          <span className={`hidden text-[11px] font-semibold sm:inline ${cancelled ? 'text-[var(--color-text-3)]' : current ? 'text-[var(--color-accent)]' : past ? 'text-[var(--color-text)]' : 'text-[var(--color-text-3)]'}`}>{sLabel}</span>
+                          <span className={`relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 text-[11px] font-bold ${cancelled ? 'border-[var(--color-border)] bg-[var(--color-bg-subtle)] text-[var(--color-text-3)]' : past ? 'border-[var(--color-accent)] bg-[var(--color-accent)] text-white' : current ? 'border-[var(--color-accent)] bg-white text-[var(--color-accent)]' : 'border-[var(--color-border)] bg-white text-[var(--color-text-3)]'}`}>{past && !cancelled ? '✓' : i + 1}{current && !cancelled && <span className="absolute inset-0 animate-ping rounded-full bg-[var(--color-accent)] opacity-30" />}</span>
+                          <span className={`text-[10px] font-semibold leading-tight ${cancelled ? 'text-[var(--color-text-3)]' : current ? 'text-[var(--color-accent)]' : past ? 'text-[var(--color-text)]' : 'text-[var(--color-text-3)]'}`}>{sLabel}</span>
                           {i < STEPS.length - 1 && <span className={`mx-1 h-0.5 flex-1 ${cancelled ? 'bg-[var(--color-border)]' : past || current ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-border)]'}`} />}
                         </div>
                       )
