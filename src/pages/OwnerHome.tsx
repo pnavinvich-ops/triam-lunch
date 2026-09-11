@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { ChevronLeft, CheckCircle2, ChefHat, ClipboardList, Plus, Store as StoreIcon, Package } from 'lucide-react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
+import { ChevronLeft, CheckCircle2, ChefHat, ClipboardList, Plus, Store as StoreIcon, Package, RefreshCw, Search } from 'lucide-react'
 import { supabase, type Order, type Store, type MenuItem } from '../lib/supabase'
 
 const KEY = 'tl_owner_store'
@@ -372,15 +372,75 @@ function Settings({ store, onStore }: { store: Store; onStore: (s: Store) => voi
   )
 }
 
+const ORDER_KEY = 'tl_my_orders'
+
+interface SavedOrder { code: string; store?: string; at?: number }
+
+// Self-healing read: one corrupt/foreign value must never crash the tab
+// again, and must never block future orders from being saved.
+function loadOrderEntries(): SavedOrder[] {
+  try {
+    const raw = localStorage.getItem(ORDER_KEY)
+    if (!raw) return []
+    const parsed: unknown = JSON.parse(raw)
+    const arr = Array.isArray(parsed) ? parsed : []
+    const clean = arr.filter(
+      (o): o is SavedOrder =>
+        !!o && typeof o === 'object' &&
+        typeof (o as { code?: unknown }).code === 'string' &&
+        (o as { code: string }).code.trim().length >= 4,
+    ).map((o) => ({ ...o, code: o.code.trim().toUpperCase() }))
+    const seen = new Map<string, SavedOrder>()
+    for (const o of clean) seen.set(o.code, o)
+    const list = [...seen.values()].slice(-20)
+    try { localStorage.setItem(ORDER_KEY, JSON.stringify(list)) } catch { /* storage full/blocked: view still works */ }
+    return list
+  } catch {
+    try { localStorage.removeItem(ORDER_KEY) } catch { /* ignore */ }
+    return []
+  }
+}
+
 export function TrackOrderView() {
-  const mine = JSON.parse(localStorage.getItem('tl_my_orders') ?? '[]') as { code: string; at: number }[]
+  const [entries, setEntries] = useState<SavedOrder[]>(loadOrderEntries)
+  const codes = useMemo(() => entries.map((e) => e.code), [entries])
   const [results, setResults] = useState<Order[]>([])
-  useEffect(() => {
-    if (mine.length)
-      supabase.from('lunch_orders').select('*, lunch_order_items(*)').in('order_code', mine.map((m) => m.code))
+  const [loading, setLoading] = useState(true)
+  const [err, setErr] = useState<string | null>(null)
+  const [lookup, setLookup] = useState('')
+  const [lookupErr, setLookupErr] = useState('')
+
+  const load = useCallback(async (list: string[]) => {
+    if (!list.length) { setResults([]); setLoading(false); setErr(null); return }
+    setLoading(true); setErr(null)
+    try {
+      const { data, error } = await supabase.from('lunch_orders')
+        .select('*, lunch_order_items(*)').in('order_code', list)
         .order('created_at', { ascending: false })
-        .then(({ data }) => setResults((data ?? []) as Order[]))
+      if (error) setErr(error.message)
+      else setResults((data ?? []) as Order[])
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'โหลดไม่สำเร็จ')
+    } finally {
+      setLoading(false)
+    }
   }, [])
+  useEffect(() => { load(codes) }, [codes, load])
+
+  const addLookup = () => {
+    const code = lookup.trim().toUpperCase()
+    setLookupErr('')
+    if (!/^T[A-Z0-9]{4,}$/.test(code)) { setLookupErr('รหัสไม่ถูกต้อง — ดูรหัส 9 หลักบนจอสั่งสำเร็จ เช่น T1A2B3C4D'); return }
+    if (codes.includes(code)) { setLookupErr('มีรหัสนี้ในรายการแล้ว'); return }
+    const next = [...entries, { code, at: Date.now() }].slice(-20)
+    try {
+      localStorage.setItem(ORDER_KEY, JSON.stringify(next))
+    } catch {
+      setLookupErr('บันทึกลงเครื่องไม่สำเร็จ — แต่ยังติดตามครั้งนี้ได้'); 
+      load([code]); return
+    }
+    setEntries(next); setLookup('')
+  }
   const STATUS = { pending: ['รอยืนยัน', 'text-amber-600 bg-amber-50'], confirmed: ['กำลังเตรียม', 'text-blue-600 bg-blue-50'], ready: ['พร้อมรับ', 'text-emerald-600 bg-emerald-50'], completed: ['สำเร็จ', 'text-neutral-500 bg-neutral-100'], cancelled: ['ยกเลิก', 'text-red-500 bg-red-50'] } as const
   const STEPS = ['รอยืนยัน', 'กำลังเตรียม', 'พร้อมรับ', 'สำเร็จ'] as const
   function statusIndex(s: Order['status']) { return ({ pending: 0, confirmed: 1, ready: 2, completed: 3, cancelled: -1 } as Record<string, number>)[s] ?? -1 }
@@ -388,22 +448,60 @@ export function TrackOrderView() {
   return (
     <div className="min-h-dvh bg-[var(--color-bg)]">
       <header className="border-b border-[var(--color-border)] bg-white px-4 pb-4 pt-6">
-        <h1 className="text-display">คำสั่งซื้อของฉัน</h1>
-        <p className="mt-0.5 text-sm text-[var(--color-text-2)]">ติดตามสถานะแบบเรียลไทม์</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-display">คำสั่งซื้อของฉัน</h1>
+            <p className="mt-0.5 text-sm text-[var(--color-text-2)]">ติดตามสถานะแบบเรียลไทม์</p>
+          </div>
+          <button onClick={() => load(codes)} disabled={loading} aria-label="รีเฟรช" className="pressable flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-border)] bg-white transition active:scale-[0.95] disabled:opacity-50">
+            <RefreshCw size={17} strokeWidth={2} className={loading ? 'animate-spin' : ''} />
+          </button>
+        </div>
       </header>
       <div className="px-4 pt-4">
-        {mine.length === 0 && (
+        <div className="mb-3 rounded-[16px] border border-[var(--color-border)] bg-white p-3.5 card-shadow">
+          <p className="text-[13px] font-bold">สั่งจากเครื่องอื่น? กรอกรหัสรับอาหาร</p>
+          <div className="mt-2 flex gap-2">
+            <input
+              value={lookup}
+              onChange={(e) => { setLookup(e.target.value.toUpperCase()); setLookupErr('') }}
+              onKeyDown={(e) => { if (e.key === 'Enter') addLookup() }}
+              placeholder="เช่น T1A2B3C4D"
+              maxLength={16}
+              aria-label="รหัสรับอาหาร"
+              className="w-full rounded-[10px] border border-[var(--color-border)] bg-white px-3.5 py-2.5 font-mono text-sm font-bold uppercase tracking-[0.1em] outline-none placeholder:font-body placeholder:font-normal placeholder:tracking-normal focus:border-[var(--color-text)]"
+            />
+            <button onClick={addLookup} className="pressable flex shrink-0 items-center gap-1.5 rounded-[10px] bg-[var(--color-text)] px-4 text-sm font-bold text-white transition active:scale-[0.97]">
+              <Search size={15} strokeWidth={2} /> ติดตาม
+            </button>
+          </div>
+          {lookupErr ? <p role="alert" className="mt-1.5 text-xs text-red-600">{lookupErr}</p> : <p className="mt-1.5 text-[11px] text-[var(--color-text-3)]">รหัสอยู่บนจอสั่งสำเร็จ — ใช้ติดตามจากเครื่องไหนก็ได้</p>}
+        </div>
+        {codes.length === 0 && (
           <div className="rounded-[16px] border border-dashed border-[var(--color-border)] bg-white p-12 text-center card-shadow">
             <Package size={30} strokeWidth={1.8} className="mx-auto text-[var(--color-text-3)]" />
             <p className="mt-3 text-sm font-semibold">ยังไม่มีคำสั่งซื้อ</p>
             <p className="mt-1 text-xs text-[var(--color-text-2)]">อุปกรณ์นี้ยังไม่เคยสั่งอาหาร</p>
           </div>
         )}
-        {mine.length > 0 && results.length === 0 && (
+        {err && (
+          <div className="mb-3 rounded-[16px] border border-red-200 bg-red-50 p-4 text-center">
+            <p className="text-sm font-bold text-red-700">โหลดไม่สำเร็จ</p>
+            <p className="mt-1 text-xs text-red-600">{err}</p>
+            <button onClick={() => load(codes)} className="pressable mt-3 rounded-full bg-red-600 px-5 py-2.5 text-xs font-bold text-white transition active:scale-[0.97]">ลองใหม่</button>
+          </div>
+        )}
+        {loading && results.length === 0 && !err && (
           <div className="rounded-[16px] border border-dashed border-[var(--color-border)] bg-white p-12 text-center card-shadow">
-            <Package size={30} strokeWidth={1.8} className="mx-auto text-[var(--color-text-3)]" />
+            <Package size={30} strokeWidth={1.8} className="mx-auto animate-pulse text-[var(--color-text-3)]" />
             <p className="mt-3 text-sm font-semibold">กำลังโหลดคำสั่งซื้อ…</p>
-            <p className="mt-1 text-xs text-[var(--color-text-2)]">หรือยังไม่มีข้อมูลบนเซิร์ฟเวอร์</p>
+          </div>
+        )}
+        {codes.length > 0 && !loading && !err && results.length === 0 && (
+          <div className="rounded-[16px] border border-dashed border-[var(--color-border)] bg-white p-8 text-center card-shadow">
+            <Search size={24} strokeWidth={1.8} className="mx-auto text-[var(--color-text-3)]" />
+            <p className="mt-2 text-sm font-semibold">ไม่พบข้อมูลในระบบ</p>
+            <p className="text-xs text-[var(--color-text-2)]">ตรวจรหัสอีกครั้ง หรือกดรีเฟรชด้านบน</p>
           </div>
         )}
         <div className="grid gap-3">

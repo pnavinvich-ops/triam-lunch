@@ -231,11 +231,18 @@ function CheckoutSheet({ store, onClose, discountedTotal, discountApplies, onTra
     const {error: err2} = await supabase.from('lunch_order_items').insert(rows)
     if (err2){ await supabase.from('lunch_orders').delete().eq('id', order.id); alert('บันทึกรายการไม่สำเร็จ ลองใหม่: '+err2.message); setBusy(false); return }
     try{ localStorage.setItem('tl_name', name.trim()); localStorage.setItem('tl_phone', phone.trim()) }catch{}
-    try{
-      const prev = JSON.parse(localStorage.getItem('tl_my_orders')??'[]') as {code:string;store:string;at:number}[]
-      const next=[...prev, { code: orderCode, store: store.name, at: Date.now() }].slice(-20)
+    try {
+      const raw = localStorage.getItem('tl_my_orders')
+      const parsed: unknown = raw ? JSON.parse(raw) : []
+      const prev = Array.isArray(parsed) ? parsed : []
+      const next = [...prev, { code: orderCode, store: store.name, at: Date.now() }].slice(-20)
       localStorage.setItem('tl_my_orders', JSON.stringify(next))
-    }catch{}
+      if (!localStorage.getItem('tl_my_orders')?.includes(orderCode)) {
+        alert(`สั่งสำเร็จ แต่บันทึกลงเครื่องไม่สำเร็จ — จดรหัสนี้ไว้: ${orderCode}`)
+      }
+    } catch {
+      alert(`สั่งสำเร็จ แต่บันทึกรหัสลงเครื่องไม่สำเร็จ — จดรหัสนี้ไว้: ${orderCode}`)
+    }
     cart.clear(); setCode(orderCode); setBusy(false)
   }
 
