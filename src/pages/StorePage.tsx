@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from 'react'
 import { ChevronLeft, Plus, Minus, Clock, MapPin, CheckCircle2, Package, Star, Heart, Share2, Info, ShieldCheck, ChevronRight, Copy } from 'lucide-react'
 import { supabase, type MenuItem, type Store } from '../lib/supabase'
+import { foodKindFor, storeKindFor } from '../lib/food'
+import FoodArt from '../components/ui/FoodArt'
 import { useCart } from '../lib/cart'
 import BottomSheet from '../components/ui/BottomSheet'
-
-const onImgErr=(e:React.SyntheticEvent<HTMLImageElement>)=>{(e.currentTarget.style.display='none'); const f=e.currentTarget.nextElementSibling as HTMLElement|null; if(f) f.style.display='flex'}
 
 function ratingForStore(id: string){ let h=0; for(let i=0;i<id.length;i++) h=(h*31+id.charCodeAt(i))>>>0; return (4.4 + (h%6)/10).toFixed(1) }
 
@@ -56,9 +56,9 @@ export default function StorePage({ id, onBack, onTrack }: { id: string; onBack:
   return (
     <div className="min-h-dvh bg-[var(--color-bg)]">
       <div className="relative">
-        <div className="relative h-[240px] w-full overflow-hidden bg-[var(--color-bg-subtle)]">
-          {store.image_url ? <><img src={store.image_url} alt={store.name} className="h-full w-full object-cover" loading="lazy" onError={onImgErr} /><div style={{display:"none"}} className="absolute inset-0 flex items-center justify-center bg-[var(--color-bg-subtle)] text-2xl font-bold text-[var(--color-text-2)]">{store.name.slice(0,2)}</div></> : <div className="flex h-full w-full items-center justify-center bg-[var(--color-bg-subtle)] text-2xl font-bold text-[var(--color-text-2)]">{store.name.slice(0,2)}</div>}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+        <div className="relative h-[248px] w-full overflow-hidden">
+          <FoodArt kind={storeKindFor(store.name)} title={store.name} className="h-full w-full" rounded={false} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-black/10" />
           <div className="absolute left-3 right-3 top-3 flex items-center justify-between">
             <button onClick={onBack} aria-label="กลับ" className="pressable flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur ring-1 ring-black/5 active:scale-[0.97]"><ChevronLeft size={18} strokeWidth={1.8} /></button>
             <div className="flex gap-2">
@@ -168,17 +168,17 @@ function FoodRow({item, storeId, storeOpen}:{item:MenuItem; storeId:string; stor
   }
 
   return (
-    <div className={`pressable flex gap-3 rounded-[16px] border border-[var(--color-border)] bg-white p-3 card-shadow transition active:scale-[0.97] ${disabled && !blockedByStore ? 'opacity-60 grayscale' : ''}`}>
+    <div className={`flex gap-3 rounded-[18px] border border-[var(--color-border)] bg-white p-3 card-shadow transition ${disabled && !blockedByStore ? 'opacity-60 grayscale' : ''}`}>
       <div className="min-w-0 flex-1">
-        <h3 className="line-clamp-1 text-[14px] font-semibold leading-tight" style={{fontFamily:'var(--font-display)'}}>{item.name}</h3>
+        <h3 className="line-clamp-1 text-[14px] font-bold leading-tight" style={{fontFamily:'var(--font-display)'}}>{item.name}</h3>
         {item.description && <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-[var(--color-text-2)]">{item.description}</p>}
-        {item.daily_note && <p className="mt-1 text-xs font-semibold text-[var(--color-accent)]">{item.daily_note}</p>}
+        {item.daily_note && <p className="mt-1 text-xs font-bold text-[var(--color-accent)]">{item.daily_note}</p>}
         <p className="mt-2 text-[15px] font-bold tabular-nums">฿{Number(item.price_thb).toFixed(0)}</p>
-        <p className="mt-1 flex items-center gap-1 text-[11px] text-[var(--color-text-2)]"><Star size={11} className="fill-amber-400 text-amber-400" strokeWidth={1.8} /> 4.8 · 50+ สั่งแล้ว</p>
+        <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-[var(--color-text-2)]"><Star size={11} className="fill-amber-400 text-amber-400" strokeWidth={2} /> 4.8 · 50+ สั่งแล้ว</p>
       </div>
-      <div className="flex w-[88px] shrink-0 flex-col items-stretch gap-2">
-        <div className="relative h-[88px] w-[88px] overflow-hidden rounded-[12px] bg-[var(--color-bg-subtle)] ring-1 ring-[var(--color-border)]">
-          {item.image_url ? <><img src={item.image_url} alt={item.name} className="h-full w-full object-cover" loading="lazy" onError={onImgErr} /><div style={{display:"none"}} className="absolute inset-0 flex items-center justify-center bg-[var(--color-bg-subtle)] text-xs font-bold">{item.name.slice(0,2)}</div></> : <div className="flex h-full w-full items-center justify-center text-xs font-bold text-[var(--color-text-3)]">{item.name.slice(0,2)}</div>}
+      <div className="flex w-[92px] shrink-0 flex-col items-stretch gap-2">
+        <div className="relative h-[92px] w-[92px] overflow-hidden rounded-[14px] ring-1 ring-[var(--color-border)]">
+          <FoodArt kind={foodKindFor(item.name, item.category)} title={item.name} className="h-full w-full" rounded={false} />
           {showBadge && <span className="absolute inset-0 flex items-center justify-center bg-white/80 text-xs font-bold backdrop-blur-[1px]">{showBadge}</span>}
         </div>
         {inCart>0 ? (

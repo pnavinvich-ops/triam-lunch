@@ -3,6 +3,9 @@ dist
 .env.local
 .env
 
+# local-only: contains API keys for MCP servers
+opencode.json
+
 .vercel
 .env*
 *.txt
